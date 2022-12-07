@@ -107,6 +107,7 @@ class DeepSpeedZeroOptimizer(ZeROOptimizer):
 
     """
     def __init__(self,
+                 module,
                  init_optimizer,
                  param_names,
                  timers,
@@ -156,6 +157,10 @@ class DeepSpeedZeroOptimizer(ZeROOptimizer):
         if not torch.cuda.is_available:
             raise SystemError("Cannot use fp16 without CUDA.")
         self.optimizer = init_optimizer
+        self.params_in_backward_order = [
+            param[1] for param in reversed(list(module.named_parameters()))
+            if param[1].requires_grad
+        ]
 
         # Load pre-built or JIT compile (un)flatten ops
         util_ops = UtilsBuilder().load()
@@ -274,6 +279,11 @@ class DeepSpeedZeroOptimizer(ZeROOptimizer):
 
         self.round_robin_bit16_groups = []
         self.round_robin_bit16_indices = []
+
+        #prepare a dict from param(in bwd order) to partition
+        if not self.round_robin_gradients:
+            self.params_to_partition_by_bwd_order = self.get_partition_info_from_bwd_params(
+            )
 
         # Use different parallel to do all_to_all_reduce related things
         # padding on each partition for alignment purposes
@@ -531,6 +541,48 @@ class DeepSpeedZeroOptimizer(ZeROOptimizer):
         self._enable_universal_checkpoint()
         self._param_slice_mappings = self._create_param_mapping()
 
+    def get_partition_info_from_bwd_params(self):
+        params_to_parition = {}
+
+        dp_size = dist.get_world_size(group=self.dp_process_group)
+        flat = self.flatten_dense_tensors_aligned(
+            self.params_in_backward_order,
+            self.nccl_start_alignment_factor * dp_size)
+        partition_size = len(flat) / dp_size
+
+        current_partition = 0
+        start_index = 0
+        end_index = partition_size
+        current_index = 0
+
+        for tensor in self.params_in_backward_order:
+            params_to_parition[id(tensor)] = []
+            tensor_size = tensor.numel()
+
+            if (current_index >= start_index and current_index < end_index):
+                params_to_parition[id(tensor)].append([
+                    current_partition,
+                    0,
+                    current_index - start_index
+                ])  #partition, tensor_offset, partition_offset
+
+            if end_index > current_index and end_index < (current_index + tensor_size):
+                params_to_parition[id(tensor)].append(
+                    [current_partition + 1,
+                     end_index - current_index,
+                     0])
+
+            current_index = current_index + tensor_size
+            if current_index >= end_index:
+                start_index = end_index
+                end_index += partition_size
+                current_partition += 1
+
+        return params_to_parition
+
+    def get_partitions_of_bwd_param(self, param):
+        return self.params_to_partition_by_bwd_order[id(param)]
+
     def _enable_universal_checkpoint(self):
         for lp_param_group in self.bit16_groups:
             enable_universal_checkpoint(param_list=lp_param_group)
@@ -708,6 +760,8 @@ class DeepSpeedZeroOptimizer(ZeROOptimizer):
                 self.total_grads_in_partition[i][partition_id] = 0
                 self.initialize_gradient_partition(i, param_group, partition_id)
                 self.is_partition_reduced[i][partition_id] = False
+
+            for partition_id in range(total_partitions):
                 self.first_param_index_in_partition[i][
                     partition_id] = self.get_first_param_index(
                         i,
@@ -786,6 +840,23 @@ class DeepSpeedZeroOptimizer(ZeROOptimizer):
             else:
                 dictionary[key] = 1
 
+        if not self.round_robin_gradients:
+            for tensor in param_group:
+                param_id = self.get_param_id(tensor)
+                for tensor_partition, offset, grad_offset in self.get_partitions_of_bwd_param(tensor):
+                    if tensor_partition == partition_id:
+                        set_key_value_list(self.param_to_partition_ids[i],
+                                           param_id,
+                                           partition_id)
+                        increment_value(self.total_grads_in_partition[i], partition_id)
+                        self.is_grad_computed[i][partition_id][param_id] = False
+                        self.grad_partition_insertion_offset[i][partition_id][
+                            param_id] = grad_offset
+                        self.grad_start_offset[i][partition_id][param_id] = offset
+
+            return
+
+        # below is for the case when self.round_robin_gradients is True
         partition_size = self.partition_size[i]
 
         start_index = partition_size * partition_id
@@ -1508,6 +1579,20 @@ class DeepSpeedZeroOptimizer(ZeROOptimizer):
         current_index = 0
         first_offset = 0
 
+        if not self.round_robin_gradients:
+            for tensor in tensor_list:
+                tensor_in_partition = False
+                for tensor_partition, offset, _ in self.get_partitions_of_bwd_param(tensor):
+                    if tensor_partition == partition_id:
+                        params_in_partition.append(tensor)
+                        if offset != 0:
+                            first_offset = offset
+                        tensor_in_partition = True
+                if not tensor_in_partition:
+                    params_not_in_partition.append(tensor)
+            return params_in_partition, params_not_in_partition, first_offset
+
+        # below is for the case when self.round_robin_gradients is True
         for tensor in tensor_list:
 
             tensor_size = tensor.numel()
@@ -1630,6 +1715,9 @@ class DeepSpeedZeroOptimizer(ZeROOptimizer):
             # we need to offset to get to the right element
             if i == 0 and first_offset > 0:
                 tensor_offset = first_offset
+                if tensor_offset > num_elements:
+                    tensor_offset -= num_elements
+                    continue
                 num_elements = num_elements - tensor_offset
 
             # we dont need all elements of the tensor

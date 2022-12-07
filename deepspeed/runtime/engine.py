@@ -1453,6 +1453,7 @@ class DeepSpeedEngine(Module):
                     )
                     overlap_comm = False
             optimizer = DeepSpeedZeroOptimizer(
+                self.module,
                 optimizer,
                 self.param_names,
                 timers=timers,
