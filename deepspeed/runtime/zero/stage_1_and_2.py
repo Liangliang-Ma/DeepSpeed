@@ -281,7 +281,7 @@ class DeepSpeedZeroOptimizer(ZeROOptimizer):
         self.round_robin_bit16_indices = []
 
         #prepare a dict from param(in bwd order) to partition
-        if not self.round_robin_gradients:
+        if not self.round_robin_gradients and not self.has_moe_layers:
             self.params_to_partition_by_bwd_order = self.get_partition_info_from_bwd_params(
             )
 
@@ -558,27 +558,29 @@ class DeepSpeedZeroOptimizer(ZeROOptimizer):
         for tensor in self.params_in_backward_order:
             params_to_parition[id(tensor)] = []
             tensor_size = tensor.numel()
-
-            if (current_index >= start_index and current_index < end_index):
+            if current_index >= start_index and current_index < end_index:
                 params_to_parition[id(tensor)].append([
                     current_partition,
                     0,
                     current_index - start_index
                 ])  #partition, tensor_offset, partition_offset
-
-            if end_index > current_index and end_index < (current_index + tensor_size):
-                params_to_parition[id(tensor)].append(
-                    [current_partition + 1,
-                     end_index - current_index,
-                     0])
-
-            current_index = current_index + tensor_size
-            if current_index >= end_index:
+            if end_index > current_index and current_index + tensor_size > end_index:
+                offset = (end_index - current_index)
+                current_partition += 1
+                start_index = end_index
+                end_index += partition_size
+                while tensor_size - offset > partition_size:
+                    params_to_parition[id(tensor)].append([current_partition, offset, 0])
+                    offset += partition_size
+                    current_partition += 1
+                    start_index = end_index
+                    end_index += partition_size
+                params_to_parition[id(tensor)].append([current_partition, offset, 0])
+            elif current_index + tensor_size == end_index:
                 start_index = end_index
                 end_index += partition_size
                 current_partition += 1
-
-        return params_to_parition
+            current_index = current_index + tensor_size
 
     def get_partitions_of_bwd_param(self, param):
         return self.params_to_partition_by_bwd_order[id(param)]
@@ -840,7 +842,7 @@ class DeepSpeedZeroOptimizer(ZeROOptimizer):
             else:
                 dictionary[key] = 1
 
-        if not self.round_robin_gradients:
+        if not self.round_robin_gradients and not self.has_moe_layers:
             for tensor in param_group:
                 param_id = self.get_param_id(tensor)
                 for tensor_partition, offset, grad_offset in self.get_partitions_of_bwd_param(tensor):
@@ -1579,7 +1581,7 @@ class DeepSpeedZeroOptimizer(ZeROOptimizer):
         current_index = 0
         first_offset = 0
 
-        if not self.round_robin_gradients:
+        if not self.round_robin_gradients and not self.has_moe_layers:
             for tensor in tensor_list:
                 tensor_in_partition = False
                 for tensor_partition, offset, _ in self.get_partitions_of_bwd_param(tensor):
