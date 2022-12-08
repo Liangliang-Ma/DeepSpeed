@@ -229,6 +229,8 @@ class DeepSpeedZeroOptimizer(ZeROOptimizer):
         self.ignore_unused_parameters = ignore_unused_parameters
         self.round_robin_gradients = round_robin_gradients
 
+        self.combine_more_reduce = not self.round_robin_gradients and not self.has_moe_layers and not self.cpu_offload
+
         self.extra_large_param_to_reduce = None
         self.fp16_master_weights_and_gradients = fp16_master_weights_and_gradients
 
@@ -281,7 +283,7 @@ class DeepSpeedZeroOptimizer(ZeROOptimizer):
         self.round_robin_bit16_indices = []
 
         #prepare a dict from param(in bwd order) to partition
-        if not self.round_robin_gradients and not self.has_moe_layers:
+        if self.combine_more_reduce:
             self.params_to_partition_by_bwd_order = self.get_partition_info_from_bwd_params(
             )
 
@@ -563,7 +565,7 @@ class DeepSpeedZeroOptimizer(ZeROOptimizer):
                     current_partition,
                     0,
                     current_index - start_index
-                ])  #partition, tensor_offset, partition_offset
+                ])  # partition, tensor_offset, partition_offset
             if end_index > current_index and current_index + tensor_size > end_index:
                 offset = (end_index - current_index)
                 current_partition += 1
@@ -842,7 +844,7 @@ class DeepSpeedZeroOptimizer(ZeROOptimizer):
             else:
                 dictionary[key] = 1
 
-        if not self.round_robin_gradients and not self.has_moe_layers:
+        if self.combine_more_reduce:
             for tensor in param_group:
                 param_id = self.get_param_id(tensor)
                 for tensor_partition, offset, grad_offset in self.get_partitions_of_bwd_param(tensor):
@@ -1581,7 +1583,7 @@ class DeepSpeedZeroOptimizer(ZeROOptimizer):
         current_index = 0
         first_offset = 0
 
-        if not self.round_robin_gradients and not self.has_moe_layers:
+        if self.combine_more_reduce:
             for tensor in tensor_list:
                 tensor_in_partition = False
                 for tensor_partition, offset, _ in self.get_partitions_of_bwd_param(tensor):
