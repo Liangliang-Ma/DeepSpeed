@@ -583,6 +583,7 @@ class DeepSpeedZeroOptimizer(ZeROOptimizer):
                 end_index += partition_size
                 current_partition += 1
             current_index = current_index + tensor_size
+        return params_to_parition
 
     def get_partitions_of_bwd_param(self, param):
         return self.params_to_partition_by_bwd_order[id(param)]
