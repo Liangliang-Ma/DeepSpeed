@@ -255,10 +255,12 @@ class DeepSpeedZeroOptimizer(ZeROOptimizer):
         # this will contain a list of equal sized tensors
         # each of which will be updated by a different process
         self.parallel_partitioned_bit16_groups = []
+        self.parallel_partitioned_bit16_groups_b = []
 
         # a single 32-bit partition of the parallel partitioned parameters
         # that this process will update
         self.single_partition_of_fp32_groups = []
+        self.single_partition_of_fp32_groups_b = []
 
         # param partition info
 
@@ -362,8 +364,14 @@ class DeepSpeedZeroOptimizer(ZeROOptimizer):
             # each process will compute on a different part of the partition
             data_parallel_partitions = self.get_data_parallel_partitions(
                 self.bit16_groups_flat[i],
-                i)
+                i, self.combine_more_reduce)
             self.parallel_partitioned_bit16_groups.append(data_parallel_partitions)
+
+            if self.combine_more_reduce:
+                data_parallel_partitions_b = self.get_data_parallel_partitions(
+                    self.bit16_groups_flat[i],
+                    i, False)
+                self.parallel_partitioned_bit16_groups_b.append(data_parallel_partitions_b)
 
             # verify that data partition start locations are 4-byte aligned
             for partitioned_data in data_parallel_partitions:
@@ -552,7 +560,7 @@ class DeepSpeedZeroOptimizer(ZeROOptimizer):
         flat = self.flatten_dense_tensors_aligned(
             self.params_in_backward_order,
             self.nccl_start_alignment_factor * dp_size)
-        partition_size = len(flat) / dp_size
+        partition_size = int(len(flat) / dp_size)
 
         current_partition = 0
         start_index = 0
@@ -566,20 +574,21 @@ class DeepSpeedZeroOptimizer(ZeROOptimizer):
                 params_to_partition[id(tensor)].append([
                     current_partition,
                     0,
-                    current_index - start_index
-                ])  # partition, tensor_offset, partition_offset
+                    current_index - start_index,
+                    min(tensor_size, end_index - current_index)
+                ])  # partition, tensor_offset, partition_offset, tensor_size
             if end_index > current_index and current_index + tensor_size > end_index:
                 offset = (end_index - current_index)
                 current_partition += 1
                 start_index = end_index
                 end_index += partition_size
                 while tensor_size - offset > partition_size:
-                    params_to_partition[id(tensor)].append([current_partition, offset, 0])
+                    params_to_partition[id(tensor)].append([current_partition, offset, 0, partition_size])
                     offset += partition_size
                     current_partition += 1
                     start_index = end_index
                     end_index += partition_size
-                params_to_partition[id(tensor)].append([current_partition, offset, 0])
+                params_to_partition[id(tensor)].append([current_partition, offset, 0, tensor_size - offset])
             elif current_index + tensor_size == end_index:
                 start_index = end_index
                 end_index += partition_size
@@ -609,18 +618,20 @@ class DeepSpeedZeroOptimizer(ZeROOptimizer):
 
     def _link_all_hp_params(self):
         dp_world_size = dist.get_world_size(group=self.dp_process_group)
+        partition_start = 0
         for i, _ in enumerate(self.optimizer.param_groups):
             # Link bit16 and fp32 params in partition
             partition_id = dist.get_rank(group=self.real_dp_process_group[i])
-            partition_size = self.bit16_groups_flat[i].numel() // dp_world_size
+            partition_size = self.single_partition_of_fp32_groups[i].numel()
             flat_hp_partition = self.single_partition_of_fp32_groups[i]
             link_hp_params(
                 lp_param_list=self.bit16_groups[i],
                 flat_hp_partition=flat_hp_partition,
-                partition_start=partition_id * partition_size,
+                partition_start=partition_start,
                 partition_size=partition_size,
                 partition_optimizer_state=self.optimizer.state[flat_hp_partition],
                 dp_group=self.real_dp_process_group[i])
+            partition_start += partition_size
 
     def is_moe_group(self, group):
         return 'moe' in group and group['moe']
@@ -696,7 +707,7 @@ class DeepSpeedZeroOptimizer(ZeROOptimizer):
 
         for i, group in enumerate(self.bit16_groups):
             single_grad_partition = torch.zeros(
-                int(self.partition_size[i]),
+                self.single_partition_of_fp32_groups[i].size(),
                 dtype=self.single_partition_of_fp32_groups[i].dtype,
                 device=self.device)
             self.single_partition_of_fp32_groups[i].grad = get_accelerator().pin_memory(
@@ -850,7 +861,7 @@ class DeepSpeedZeroOptimizer(ZeROOptimizer):
         if self.combine_more_reduce:
             for tensor in param_group:
                 param_id = self.get_param_id(tensor)
-                for tensor_partition, offset, grad_offset in self.get_partitions_of_bwd_param(tensor):
+                for tensor_partition, offset, grad_offset, tensor_size in self.get_partitions_of_bwd_param(tensor):
                     if tensor_partition == partition_id:
                         set_key_value_list(self.param_to_partition_ids[i],
                                            param_id,
@@ -1558,11 +1569,29 @@ class DeepSpeedZeroOptimizer(ZeROOptimizer):
 
     # views the tensor as multiple partitions and returns
     # those partitions
-    def get_data_parallel_partitions(self, tensor, group_id):
+    def get_data_parallel_partitions(self, tensor, group_id, combine):
+        param_group = self.optimizer.param_groups[group_id]
+        trainable_parameters = [
+                param for param in param_group['params'] if param.requires_grad
+            ]
         partitions = []
-
         dp = dist.get_world_size(group=self.real_dp_process_group[group_id])
-        # dp_id = dist.get_rank(group=self.real_dp_process_group[group_id])
+        dp_id = dist.get_rank(group=self.real_dp_process_group[group_id])
+
+        if combine:
+            for id in range(dp):
+                partitions.append(None)
+
+            for t in trainable_parameters:
+                for tensor_partition, offset, grad_offset, tensor_size in self.get_partitions_of_bwd_param(t):
+                    ft = t.flatten()
+                    if partitions[tensor_partition] == None:
+                        partitions[tensor_partition] = ft.narrow(0, offset, tensor_size).flatten()
+                    elif torch.is_tensor(partitions[tensor_partition]):
+                        origin = partitions[tensor_partition]
+                        new = ft.narrow(0, offset, tensor_size).flatten()
+                        partitions[tensor_partition] = torch.cat([origin, new], 0).flatten()
+            return partitions
 
         total_num_elements = tensor.numel()
 
@@ -1591,7 +1620,7 @@ class DeepSpeedZeroOptimizer(ZeROOptimizer):
         if self.combine_more_reduce:
             for tensor in tensor_list:
                 tensor_in_partition = False
-                for tensor_partition, offset, _ in self.get_partitions_of_bwd_param(tensor):
+                for tensor_partition, offset, _ , _ in self.get_partitions_of_bwd_param(tensor):
                     if tensor_partition == partition_id:
                         params_in_partition.append(tensor)
                         if offset != 0:
@@ -1713,7 +1742,9 @@ class DeepSpeedZeroOptimizer(ZeROOptimizer):
                            return_tensor_list=False):
         flat_tensor_list = []
         current_size = 0
+        partition_id = dist.get_rank(group=self.real_dp_process_group[0])
         for i, tensor in enumerate(tensor_list):
+            origin = tensor
             if tensor.grad is None:
                 tensor.grad = torch.zeros_like(tensor)
 
@@ -1722,16 +1753,19 @@ class DeepSpeedZeroOptimizer(ZeROOptimizer):
             tensor_offset = 0
 
             # we need to offset to get to the right element
-            if i == 0 and first_offset > 0:
+            if not self.combine_more_reduce and i == 0 and first_offset > 0:
                 tensor_offset = first_offset
-                if tensor_offset > num_elements:
-                    tensor_offset -= num_elements
-                    continue
                 num_elements = num_elements - tensor_offset
+            elif self.combine_more_reduce:
+                for tensor_partition, offset, grad_offset, tensor_size in self.get_partitions_of_bwd_param(origin):
+                    if tensor_partition == partition_id:
+                        tensor_offset = offset
+                        num_elements = tensor_size
 
             # we dont need all elements of the tensor
-            if num_elements > (partition_size - current_size):
-                num_elements = partition_size - current_size
+            if not self.combine_more_reduce:
+                if num_elements > (partition_size - current_size):
+                    num_elements = partition_size - current_size
 
             # we need a narrow view of the tensor based on the tensor offset and number of elements that
             # we need from this tensor
@@ -1746,7 +1780,7 @@ class DeepSpeedZeroOptimizer(ZeROOptimizer):
             current_size = current_size + num_elements
 
         # this means its the last partition and does not align with the dp boundary. We need to pad before flattening
-        if current_size < partition_size:
+        if not self.combine_more_reduce and current_size < partition_size:
             flat_tensor_list.append(
                 torch.zeros(int(partition_size - current_size),
                             dtype=dtype,
@@ -1911,7 +1945,7 @@ class DeepSpeedZeroOptimizer(ZeROOptimizer):
                 # create a flat gradients for parameters updated by this process
                 # If we are last partition, ensure we have same size grads and partition size, if not pad with zero tensors
                 if partition_id == dist.get_world_size(
-                        group=self.real_dp_process_group[i]) - 1:
+                        group=self.real_dp_process_group[i]) - 1 and not self.combine_more_reduce:
                     single_grad_partition = self.flatten_dense_tensors_aligned(
                         self.averaged_gradients[i],
                         int(self.partition_size[i])).to(
@@ -1919,9 +1953,10 @@ class DeepSpeedZeroOptimizer(ZeROOptimizer):
                 else:
                     single_grad_partition = self.flatten(self.averaged_gradients[i]).to(
                         self.single_partition_of_fp32_groups[i].dtype)
-                assert single_grad_partition.numel() == self.partition_size[i], \
-                    "averaged gradients have different number of elements that partition size {} {} {} {}".format(
-                        single_grad_partition.numel(), self.partition_size[i], i, partition_id)
+                if not self.combine_more_reduce:
+                    assert single_grad_partition.numel() == self.partition_size[i], \
+                        "averaged gradients have different number of elements that partition size {} {} {} {}".format(
+                            single_grad_partition.numel(), self.partition_size[i], i, partition_id)
 
                 self.single_partition_of_fp32_groups[i].grad = single_grad_partition
                 # release all the gradient since we have already created a necessary copy in dp_grad_partition(ZeRO stage2)
@@ -1941,7 +1976,17 @@ class DeepSpeedZeroOptimizer(ZeROOptimizer):
                 del single_grad_partition
                 bit16_partitions = self.parallel_partitioned_bit16_groups[i]
                 fp32_partition = self.single_partition_of_fp32_groups[i]
-                bit16_partitions[partition_id].data.copy_(fp32_partition.data)
+                if not self.combine_more_reduce:
+                    bit16_partitions[partition_id].data.copy_(fp32_partition.data)
+                else:
+                    flat_start = 0
+                    combine_tensor_start = 0
+                    for t in self.bit16_groups[i]:
+                        for tensor_partition, offset, grad_offset, tensor_size in self.get_partitions_of_bwd_param(t):
+                            if tensor_partition == partition_id:
+                                self.bit16_groups_flat[i].narrow(0, flat_start, tensor_size).data.copy_(fp32_partition.narrow(0, combine_tensor_start, tensor_size).data)
+                                combine_tensor_start += tensor_size
+                        flat_start += t.numel()
                 self.stop_timers([OPTIMIZER_STEP])
 
         see_memory_usage('After optimizer before all-gather')
@@ -1951,8 +1996,9 @@ class DeepSpeedZeroOptimizer(ZeROOptimizer):
         self.start_timers([OPTIMIZER_ALLGATHER])
         # Gather the updated weights from everyone.
         # Then all partitions of the model parameters are updated and ready for next round forward.
+        all_gather_params = self.parallel_partitioned_bit16_groups if not self.combine_more_reduce else self.parallel_partitioned_bit16_groups_b
         all_gather_dp_groups(
-            partitioned_param_groups=self.parallel_partitioned_bit16_groups,
+            partitioned_param_groups=all_gather_params,
             dp_process_group=self.real_dp_process_group,
             start_alignment_factor=self.nccl_start_alignment_factor,
             allgather_bucket_size=self.allgather_bucket_size)
