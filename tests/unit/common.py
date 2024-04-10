@@ -121,7 +121,7 @@ class DistributedExec(ABC):
     set_dist_env = True
     requires_cuda_env = True
     reuse_dist_env = False
-    non_daemonic_procs = False
+    non_daemonic_procs = True
     _pool_cache = {}
     exec_timeout = DEEPSPEED_TEST_TIMEOUT
 
