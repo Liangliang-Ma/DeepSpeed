@@ -1,0 +1,876 @@
+[1m============================= test session starts ==============================[0m
+platform linux -- Python 3.10.12, pytest-8.1.1, pluggy-1.4.0 -- /usr/bin/python3
+cachedir: .pytest_cache
+rootdir: /DeepSpeed/tests
+configfile: pytest.ini
+plugins: timeout-2.3.1
+[1mcollecting ... [0mcollected 5 items
+
+checkpoint/test_moe_checkpoint.py::TestMoECheckpoint::test_checkpoint_moe[4] [31mFAILED[0m[31m [ 20%][0m
+checkpoint/test_moe_checkpoint.py::TestMoECheckpoint::test_checkpoint_moe_and_zero[4-True] [31mFAILED[0m[31m [ 40%][0m
+checkpoint/test_moe_checkpoint.py::TestMoECheckpoint::test_checkpoint_moe_and_zero[4-False] [31mFAILED[0m[31m [ 60%][0m
+checkpoint/test_moe_checkpoint.py::TestMoECheckpoint::test_checkpoint_moe_and_zero[2-True] [31mFAILED[0m[31m [ 80%][0m
+checkpoint/test_moe_checkpoint.py::TestMoECheckpoint::test_checkpoint_moe_and_zero[2-False] [31mFAILED[0m[31m [100%][0m
+
+=================================== FAILURES ===================================
+[31m[1m___________________ TestMoECheckpoint.test_checkpoint_moe[4] ___________________[0m
+Worker 0 exited with code 1
+----------------------------- Captured stdout call -----------------------------
+[2024-04-10 06:09:02,812] [INFO] [real_accelerator.py:203:get_accelerator] Setting ds_accelerator to xpu (auto detect)
+[2024-04-10 06:09:02,822] [INFO] [real_accelerator.py:203:get_accelerator] Setting ds_accelerator to xpu (auto detect)
+[2024-04-10 06:09:02,830] [INFO] [real_accelerator.py:203:get_accelerator] Setting ds_accelerator to xpu (auto detect)
+[2024-04-10 06:09:02,839] [INFO] [real_accelerator.py:203:get_accelerator] Setting ds_accelerator to xpu (auto detect)
+[2024-04-10 06:09:02,840] [INFO] [real_accelerator.py:203:get_accelerator] Setting ds_accelerator to xpu (auto detect)
+[2024-04-10 06:09:02,844] [INFO] [real_accelerator.py:203:get_accelerator] Setting ds_accelerator to xpu (auto detect)
+[2024-04-10 06:09:02,857] [INFO] [real_accelerator.py:203:get_accelerator] Setting ds_accelerator to xpu (auto detect)
+[2024-04-10 06:09:02,862] [INFO] [real_accelerator.py:203:get_accelerator] Setting ds_accelerator to xpu (auto detect)
+[93m [WARNING] [0m async_io requires the dev libaio .so object and headers but these were not found.
+[93m [WARNING] [0m async_io: please install the libaio-dev package with apt
+[93m [WARNING] [0m If libaio is already installed (perhaps from source), try setting the CFLAGS and LDFLAGS environment variables to where it can be found.
+[2024-04-10 06:09:03,607] [INFO] [comm.py:161:init_deepspeed_backend] Initialize ccl backend
+[2024-04-10 06:09:03,607] [INFO] [comm.py:637:init_distributed] cdb=None
+[2024-04-10 06:09:03,607] [INFO] [comm.py:668:init_distributed] Initializing TorchBackend in DeepSpeed with backend ccl
+[93m [WARNING] [0m async_io requires the dev libaio .so object and headers but these were not found.
+[93m [WARNING] [0m async_io: please install the libaio-dev package with apt
+[93m [WARNING] [0m If libaio is already installed (perhaps from source), try setting the CFLAGS and LDFLAGS environment variables to where it can be found.
+[2024-04-10 06:09:03,635] [INFO] [comm.py:161:init_deepspeed_backend] Initialize ccl backend
+[2024-04-10 06:09:03,635] [INFO] [comm.py:637:init_distributed] cdb=None
+2024:04:10-06:09:03:(31943) |CCL_WARN| did not find MPI-launcher specific variables, switch to ATL/OFI, to force enable ATL/MPI set CCL_ATL_TRANSPORT=mpi
+2024:04:10-06:09:03:(31943) |CCL_WARN| could not get local_idx/count from environment variables, trying to get them from ATL
+2024:04:10-06:09:03:(31943) |CCL_WARN| fallback to 'sockets' mode of ze exchange mechanism, to use CCL_ZE_IPC_EXHANGE=drmfd, set CCL_LOCAL_RANK/SIZE explicitly  or use process launcher
+2024:04:10-06:09:03:(31943) |CCL_WARN| could not open the library: libfabric.so, error: libfabric.so: cannot open shared object file: No such file or directory
+2024:04:10-06:09:03:(31943) |CCL_WARN| OFI transport was not initialized, fallback to MPI transport
+[93m [WARNING] [0m async_io requires the dev libaio .so object and headers but these were not found.
+[93m [WARNING] [0m async_io: please install the libaio-dev package with apt
+[93m [WARNING] [0m If libaio is already installed (perhaps from source), try setting the CFLAGS and LDFLAGS environment variables to where it can be found.
+[2024-04-10 06:09:03,659] [INFO] [comm.py:161:init_deepspeed_backend] Initialize ccl backend
+[2024-04-10 06:09:03,659] [INFO] [comm.py:637:init_distributed] cdb=None
+2024:04:10-06:09:03:(31941) |CCL_WARN| did not find MPI-launcher specific variables, switch to ATL/OFI, to force enable ATL/MPI set CCL_ATL_TRANSPORT=mpi
+2024:04:10-06:09:03:(31941) |CCL_WARN| could not get local_idx/count from environment variables, trying to get them from ATL
+2024:04:10-06:09:03:(31941) |CCL_WARN| fallback to 'sockets' mode of ze exchange mechanism, to use CCL_ZE_IPC_EXHANGE=drmfd, set CCL_LOCAL_RANK/SIZE explicitly  or use process launcher
+2024:04:10-06:09:03:(31941) |CCL_WARN| could not open the library: libfabric.so, error: libfabric.so: cannot open shared object file: No such file or directory
+2024:04:10-06:09:03:(31941) |CCL_WARN| OFI transport was not initialized, fallback to MPI transport
+[93m [WARNING] [0m async_io requires the dev libaio .so object and headers but these were not found.
+[93m [WARNING] [0m async_io: please install the libaio-dev package with apt
+[93m [WARNING] [0m If libaio is already installed (perhaps from source), try setting the CFLAGS and LDFLAGS environment variables to where it can be found.
+[2024-04-10 06:09:03,683] [INFO] [comm.py:161:init_deepspeed_backend] Initialize ccl backend
+[2024-04-10 06:09:03,683] [INFO] [comm.py:637:init_distributed] cdb=None
+2024:04:10-06:09:03:(31942) |CCL_WARN| did not find MPI-launcher specific variables, switch to ATL/OFI, to force enable ATL/MPI set CCL_ATL_TRANSPORT=mpi
+2024:04:10-06:09:03:(31942) |CCL_WARN| could not get local_idx/count from environment variables, trying to get them from ATL
+2024:04:10-06:09:03:(31942) |CCL_WARN| fallback to 'sockets' mode of ze exchange mechanism, to use CCL_ZE_IPC_EXHANGE=drmfd, set CCL_LOCAL_RANK/SIZE explicitly  or use process launcher
+2024:04:10-06:09:03:(31942) |CCL_WARN| could not open the library: libfabric.so, error: libfabric.so: cannot open shared object file: No such file or directory
+2024:04:10-06:09:03:(31942) |CCL_WARN| OFI transport was not initialized, fallback to MPI transport
+2024:04:10-06:09:03:(31940) |CCL_WARN| did not find MPI-launcher specific variables, switch to ATL/OFI, to force enable ATL/MPI set CCL_ATL_TRANSPORT=mpi
+2024:04:10-06:09:03:(31940) |CCL_WARN| could not get local_idx/count from environment variables, trying to get them from ATL
+2024:04:10-06:09:03:(31940) |CCL_WARN| fallback to 'sockets' mode of ze exchange mechanism, to use CCL_ZE_IPC_EXHANGE=drmfd, set CCL_LOCAL_RANK/SIZE explicitly  or use process launcher
+2024:04:10-06:09:03:(31940) |CCL_WARN| could not open the library: libfabric.so, error: libfabric.so: cannot open shared object file: No such file or directory
+2024:04:10-06:09:03:(31940) |CCL_WARN| OFI transport was not initialized, fallback to MPI transport
+----------------------------- Captured stderr call -----------------------------
+/usr/local/lib/python3.10/dist-packages/torchvision/io/image.py:13: UserWarning: Failed to load image Python extension: 'libpng16.so.16: cannot open shared object file: No such file or directory'If you don't plan on using image functionality from `torchvision.io`, you can ignore this warning. Otherwise, there might be something wrong with your environment. Did you have `libjpeg` or `libpng` installed before building `torchvision` from source?
+  warn(
+/usr/local/lib/python3.10/dist-packages/torchvision/io/image.py:13: UserWarning: Failed to load image Python extension: 'libpng16.so.16: cannot open shared object file: No such file or directory'If you don't plan on using image functionality from `torchvision.io`, you can ignore this warning. Otherwise, there might be something wrong with your environment. Did you have `libjpeg` or `libpng` installed before building `torchvision` from source?
+  warn(
+/usr/local/lib/python3.10/dist-packages/torchvision/io/image.py:13: UserWarning: Failed to load image Python extension: 'libpng16.so.16: cannot open shared object file: No such file or directory'If you don't plan on using image functionality from `torchvision.io`, you can ignore this warning. Otherwise, there might be something wrong with your environment. Did you have `libjpeg` or `libpng` installed before building `torchvision` from source?
+  warn(
+/usr/local/lib/python3.10/dist-packages/torchvision/io/image.py:13: UserWarning: Failed to load image Python extension: 'libpng16.so.16: cannot open shared object file: No such file or directory'If you don't plan on using image functionality from `torchvision.io`, you can ignore this warning. Otherwise, there might be something wrong with your environment. Did you have `libjpeg` or `libpng` installed before building `torchvision` from source?
+  warn(
+2024:04:10-06:09:03:(31943) |CCL_ERROR| atl_mpi_ctx.cpp:605 check_impi_env: CCL/MPI uses Intel(R) MPI Library but neither I_MPI_ROOT nor ONEAPI_ROOT is set. Please source release version of Intel(R) MPI Library (2019 or higher version).
+2024:04:10-06:09:03:(31943) |CCL_ERROR| atl_mpi_ctx.cpp:605 check_impi_env: CCL/MPI uses Intel(R) MPI Library but neither I_MPI_ROOT nor ONEAPI_ROOT is set. Please source release version of Intel(R) MPI Library (2019 or higher version).
+2024:04:10-06:09:03:(31941) |CCL_ERROR| atl_mpi_ctx.cpp:605 check_impi_env: CCL/MPI uses Intel(R) MPI Library but neither I_MPI_ROOT nor ONEAPI_ROOT is set. Please source release version of Intel(R) MPI Library (2019 or higher version).
+2024:04:10-06:09:03:(31941) |CCL_ERROR| atl_mpi_ctx.cpp:605 check_impi_env: CCL/MPI uses Intel(R) MPI Library but neither I_MPI_ROOT nor ONEAPI_ROOT is set. Please source release version of Intel(R) MPI Library (2019 or higher version).
+2024:04:10-06:09:03:(31942) |CCL_ERROR| atl_mpi_ctx.cpp:605 check_impi_env: CCL/MPI uses Intel(R) MPI Library but neither I_MPI_ROOT nor ONEAPI_ROOT is set. Please source release version of Intel(R) MPI Library (2019 or higher version).
+2024:04:10-06:09:03:(31942) |CCL_ERROR| atl_mpi_ctx.cpp:605 check_impi_env: CCL/MPI uses Intel(R) MPI Library but neither I_MPI_ROOT nor ONEAPI_ROOT is set. Please source release version of Intel(R) MPI Library (2019 or higher version).
+2024:04:10-06:09:03:(31940) |CCL_ERROR| atl_mpi_ctx.cpp:605 check_impi_env: CCL/MPI uses Intel(R) MPI Library but neither I_MPI_ROOT nor ONEAPI_ROOT is set. Please source release version of Intel(R) MPI Library (2019 or higher version).
+2024:04:10-06:09:03:(31940) |CCL_ERROR| atl_mpi_ctx.cpp:605 check_impi_env: CCL/MPI uses Intel(R) MPI Library but neither I_MPI_ROOT nor ONEAPI_ROOT is set. Please source release version of Intel(R) MPI Library (2019 or higher version).
+2024:04:10-06:09:04:(31940) |CCL_ERROR| atl_mpi_ctx.cpp:605 check_impi_env: CCL/MPI uses Intel(R) MPI Library but neither I_MPI_ROOT nor ONEAPI_ROOT is set. Please source release version of Intel(R) MPI Library (2019 or higher version).2024:04:10-06:09:04:(31941) |CCL_ERROR| atl_mpi_ctx.cpp:605 check_impi_env: CCL/MPI uses Intel(R) MPI Library but neither I_MPI_ROOT nor ONEAPI_ROOT is set. Please source release version of Intel(R) MPI Library (2019 or higher version).2024:04:10-06:09:04:(31943) |CCL_ERROR| atl_mpi_ctx.cpp:605 check_impi_env: CCL/MPI uses Intel(R) MPI Library but neither I_MPI_ROOT nor ONEAPI_ROOT is set. Please source release version of Intel(R) MPI Library (2019 or higher version).2024:04:10-06:09:04:(31942) |CCL_ERROR| atl_mpi_ctx.cpp:605 check_impi_env: CCL/MPI uses Intel(R) MPI Library but neither I_MPI_ROOT nor ONEAPI_ROOT is set. Please source release version of Intel(R) MPI Library (2019 or higher version).
+
+
+
+2024:04:10-06:09:04:(31940) |CCL_ERROR| atl_mpi_comm.cpp:87 init_transport: condition transport->init(nullptr, nullptr, &attr, nullptr, pmi) == ATL_STATUS_SUCCESS failed
+failed to initialize ATL2024:04:10-06:09:04:(31941) |CCL_ERROR| atl_mpi_comm.cpp:87 init_transport: condition transport->init(nullptr, nullptr, &attr, nullptr, pmi) == ATL_STATUS_SUCCESS failed
+failed to initialize ATL2024:04:10-06:09:04:(31943) |CCL_ERROR| atl_mpi_comm.cpp:87 init_transport: condition transport->init(nullptr, nullptr, &attr, nullptr, pmi) == ATL_STATUS_SUCCESS failed
+failed to initialize ATL
+2024:04:10-06:09:04:(31942) |CCL_ERROR| atl_mpi_comm.cpp:87 init_transport: condition transport->init(nullptr, nullptr, &attr, nullptr, pmi) == ATL_STATUS_SUCCESS failed
+failed to initialize ATL
+
+
+Process Process-65:
+Process Process-66:
+Process Process-68:
+Process Process-67:
+Traceback (most recent call last):
+Traceback (most recent call last):
+Traceback (most recent call last):
+  File "/usr/lib/python3.10/multiprocessing/process.py", line 314, in _bootstrap
+    self.run()
+  File "/usr/lib/python3.10/multiprocessing/process.py", line 314, in _bootstrap
+    self.run()
+  File "/usr/lib/python3.10/multiprocessing/process.py", line 108, in run
+    self._target(*self._args, **self._kwargs)
+  File "/usr/lib/python3.10/multiprocessing/process.py", line 108, in run
+    self._target(*self._args, **self._kwargs)
+  File "/DeepSpeed/tests/unit/common.py", line 284, in _dist_run
+    dist.barrier()
+  File "/DeepSpeed/tests/unit/common.py", line 284, in _dist_run
+    dist.barrier()
+  File "/DeepSpeed/deepspeed/comm/comm.py", line 117, in log_wrapper
+    return func(*args, **kwargs)
+  File "/DeepSpeed/deepspeed/comm/comm.py", line 117, in log_wrapper
+    return func(*args, **kwargs)
+  File "/DeepSpeed/deepspeed/comm/comm.py", line 408, in barrier
+    return cdb.barrier(group=group, async_op=async_op)
+  File "/DeepSpeed/deepspeed/comm/comm.py", line 408, in barrier
+    return cdb.barrier(group=group, async_op=async_op)
+  File "/usr/local/lib/python3.10/dist-packages/torch/_dynamo/eval_frame.py", line 328, in _fn
+    return fn(*args, **kwargs)
+  File "/usr/local/lib/python3.10/dist-packages/torch/_dynamo/eval_frame.py", line 328, in _fn
+    return fn(*args, **kwargs)
+  File "/DeepSpeed/deepspeed/comm/torch.py", line 335, in barrier
+    return torch.distributed.barrier(group=group, async_op=async_op, device_ids=device_ids)
+  File "/DeepSpeed/deepspeed/comm/torch.py", line 335, in barrier
+    return torch.distributed.barrier(group=group, async_op=async_op, device_ids=device_ids)
+  File "/usr/local/lib/python3.10/dist-packages/torch/distributed/c10d_logger.py", line 47, in wrapper
+    return func(*args, **kwargs)
+  File "/usr/lib/python3.10/multiprocessing/process.py", line 314, in _bootstrap
+    self.run()
+  File "/usr/local/lib/python3.10/dist-packages/torch/distributed/c10d_logger.py", line 47, in wrapper
+    return func(*args, **kwargs)
+  File "/usr/local/lib/python3.10/dist-packages/torch/distributed/distributed_c10d.py", line 3698, in barrier
+    work = group.barrier(opts=opts)
+  File "/usr/lib/python3.10/multiprocessing/process.py", line 108, in run
+    self._target(*self._args, **self._kwargs)
+  File "/usr/local/lib/python3.10/dist-packages/torch/distributed/distributed_c10d.py", line 3698, in barrier
+    work = group.barrier(opts=opts)
+  File "/DeepSpeed/tests/unit/common.py", line 284, in _dist_run
+    dist.barrier()
+  File "/DeepSpeed/deepspeed/comm/comm.py", line 117, in log_wrapper
+    return func(*args, **kwargs)
+RuntimeError: oneCCL: atl_mpi_comm.cpp:87 init_transport: EXCEPTION: failed to initialize ATL
+RuntimeError: oneCCL: atl_mpi_comm.cpp:87 init_transport: EXCEPTION: failed to initialize ATL
+  File "/DeepSpeed/deepspeed/comm/comm.py", line 408, in barrier
+    return cdb.barrier(group=group, async_op=async_op)
+  File "/usr/local/lib/python3.10/dist-packages/torch/_dynamo/eval_frame.py", line 328, in _fn
+    return fn(*args, **kwargs)
+  File "/DeepSpeed/deepspeed/comm/torch.py", line 335, in barrier
+    return torch.distributed.barrier(group=group, async_op=async_op, device_ids=device_ids)
+  File "/usr/local/lib/python3.10/dist-packages/torch/distributed/c10d_logger.py", line 47, in wrapper
+    return func(*args, **kwargs)
+  File "/usr/local/lib/python3.10/dist-packages/torch/distributed/distributed_c10d.py", line 3698, in barrier
+    work = group.barrier(opts=opts)
+RuntimeError: oneCCL: atl_mpi_comm.cpp:87 init_transport: EXCEPTION: failed to initialize ATL
+Traceback (most recent call last):
+  File "/usr/lib/python3.10/multiprocessing/process.py", line 314, in _bootstrap
+    self.run()
+  File "/usr/lib/python3.10/multiprocessing/process.py", line 108, in run
+    self._target(*self._args, **self._kwargs)
+  File "/DeepSpeed/tests/unit/common.py", line 284, in _dist_run
+    dist.barrier()
+  File "/DeepSpeed/deepspeed/comm/comm.py", line 117, in log_wrapper
+    return func(*args, **kwargs)
+  File "/DeepSpeed/deepspeed/comm/comm.py", line 408, in barrier
+    return cdb.barrier(group=group, async_op=async_op)
+  File "/usr/local/lib/python3.10/dist-packages/torch/_dynamo/eval_frame.py", line 328, in _fn
+    return fn(*args, **kwargs)
+  File "/DeepSpeed/deepspeed/comm/torch.py", line 335, in barrier
+    return torch.distributed.barrier(group=group, async_op=async_op, device_ids=device_ids)
+  File "/usr/local/lib/python3.10/dist-packages/torch/distributed/c10d_logger.py", line 47, in wrapper
+    return func(*args, **kwargs)
+  File "/usr/local/lib/python3.10/dist-packages/torch/distributed/distributed_c10d.py", line 3698, in barrier
+    work = group.barrier(opts=opts)
+RuntimeError: oneCCL: atl_mpi_comm.cpp:87 init_transport: EXCEPTION: failed to initialize ATL
+[31m[1m____________ TestMoECheckpoint.test_checkpoint_moe_and_zero[4-True] ____________[0m
+Worker 0 exited with code 1
+----------------------------- Captured stdout call -----------------------------
+[2024-04-10 06:09:07,357] [INFO] [real_accelerator.py:203:get_accelerator] Setting ds_accelerator to xpu (auto detect)
+[2024-04-10 06:09:07,372] [INFO] [real_accelerator.py:203:get_accelerator] Setting ds_accelerator to xpu (auto detect)
+[2024-04-10 06:09:07,375] [INFO] [real_accelerator.py:203:get_accelerator] Setting ds_accelerator to xpu (auto detect)
+[2024-04-10 06:09:07,383] [INFO] [real_accelerator.py:203:get_accelerator] Setting ds_accelerator to xpu (auto detect)
+[2024-04-10 06:09:07,383] [INFO] [real_accelerator.py:203:get_accelerator] Setting ds_accelerator to xpu (auto detect)
+[2024-04-10 06:09:07,390] [INFO] [real_accelerator.py:203:get_accelerator] Setting ds_accelerator to xpu (auto detect)
+[2024-04-10 06:09:07,401] [INFO] [real_accelerator.py:203:get_accelerator] Setting ds_accelerator to xpu (auto detect)
+[2024-04-10 06:09:07,401] [INFO] [real_accelerator.py:203:get_accelerator] Setting ds_accelerator to xpu (auto detect)
+[93m [WARNING] [0m async_io requires the dev libaio .so object and headers but these were not found.
+[93m [WARNING] [0m async_io: please install the libaio-dev package with apt
+[93m [WARNING] [0m If libaio is already installed (perhaps from source), try setting the CFLAGS and LDFLAGS environment variables to where it can be found.
+[2024-04-10 06:09:08,265] [INFO] [comm.py:161:init_deepspeed_backend] Initialize ccl backend
+[2024-04-10 06:09:08,265] [INFO] [comm.py:637:init_distributed] cdb=None
+[93m [WARNING] [0m async_io requires the dev libaio .so object and headers but these were not found.
+[93m [WARNING] [0m async_io: please install the libaio-dev package with apt
+[93m [WARNING] [0m If libaio is already installed (perhaps from source), try setting the CFLAGS and LDFLAGS environment variables to where it can be found.
+[2024-04-10 06:09:08,292] [INFO] [comm.py:161:init_deepspeed_backend] Initialize ccl backend
+[2024-04-10 06:09:08,292] [INFO] [comm.py:637:init_distributed] cdb=None
+[93m [WARNING] [0m async_io requires the dev libaio .so object and headers but these were not found.
+[93m [WARNING] [0m async_io: please install the libaio-dev package with apt
+[93m [WARNING] [0m If libaio is already installed (perhaps from source), try setting the CFLAGS and LDFLAGS environment variables to where it can be found.
+[2024-04-10 06:09:08,303] [INFO] [comm.py:161:init_deepspeed_backend] Initialize ccl backend
+[2024-04-10 06:09:08,303] [INFO] [comm.py:637:init_distributed] cdb=None
+[93m [WARNING] [0m async_io requires the dev libaio .so object and headers but these were not found.
+[93m [WARNING] [0m async_io: please install the libaio-dev package with apt
+[93m [WARNING] [0m If libaio is already installed (perhaps from source), try setting the CFLAGS and LDFLAGS environment variables to where it can be found.
+[2024-04-10 06:09:08,333] [INFO] [comm.py:161:init_deepspeed_backend] Initialize ccl backend
+[2024-04-10 06:09:08,333] [INFO] [comm.py:637:init_distributed] cdb=None
+[2024-04-10 06:09:08,333] [INFO] [comm.py:668:init_distributed] Initializing TorchBackend in DeepSpeed with backend ccl
+2024:04:10-06:09:09:(33664) |CCL_WARN| did not find MPI-launcher specific variables, switch to ATL/OFI, to force enable ATL/MPI set CCL_ATL_TRANSPORT=mpi
+2024:04:10-06:09:09:(33664) |CCL_WARN| could not get local_idx/count from environment variables, trying to get them from ATL
+2024:04:10-06:09:09:(33664) |CCL_WARN| fallback to 'sockets' mode of ze exchange mechanism, to use CCL_ZE_IPC_EXHANGE=drmfd, set CCL_LOCAL_RANK/SIZE explicitly  or use process launcher
+2024:04:10-06:09:09:(33664) |CCL_WARN| could not open the library: libfabric.so, error: libfabric.so: cannot open shared object file: No such file or directory
+2024:04:10-06:09:09:(33664) |CCL_WARN| OFI transport was not initialized, fallback to MPI transport
+2024:04:10-06:09:09:(33663) |CCL_WARN| did not find MPI-launcher specific variables, switch to ATL/OFI, to force enable ATL/MPI set CCL_ATL_TRANSPORT=mpi
+2024:04:10-06:09:09:(33663) |CCL_WARN| could not get local_idx/count from environment variables, trying to get them from ATL
+2024:04:10-06:09:09:(33663) |CCL_WARN| fallback to 'sockets' mode of ze exchange mechanism, to use CCL_ZE_IPC_EXHANGE=drmfd, set CCL_LOCAL_RANK/SIZE explicitly  or use process launcher
+2024:04:10-06:09:09:(33663) |CCL_WARN| could not open the library: libfabric.so, error: libfabric.so: cannot open shared object file: No such file or directory
+2024:04:10-06:09:09:(33663) |CCL_WARN| OFI transport was not initialized, fallback to MPI transport
+2024:04:10-06:09:09:(33662) |CCL_WARN| did not find MPI-launcher specific variables, switch to ATL/OFI, to force enable ATL/MPI set CCL_ATL_TRANSPORT=mpi
+2024:04:10-06:09:09:(33662) |CCL_WARN| could not get local_idx/count from environment variables, trying to get them from ATL
+2024:04:10-06:09:09:(33662) |CCL_WARN| fallback to 'sockets' mode of ze exchange mechanism, to use CCL_ZE_IPC_EXHANGE=drmfd, set CCL_LOCAL_RANK/SIZE explicitly  or use process launcher
+2024:04:10-06:09:09:(33662) |CCL_WARN| could not open the library: libfabric.so, error: libfabric.so: cannot open shared object file: No such file or directory
+2024:04:10-06:09:09:(33662) |CCL_WARN| OFI transport was not initialized, fallback to MPI transport
+2024:04:10-06:09:09:(33661) |CCL_WARN| did not find MPI-launcher specific variables, switch to ATL/OFI, to force enable ATL/MPI set CCL_ATL_TRANSPORT=mpi
+2024:04:10-06:09:09:(33661) |CCL_WARN| could not get local_idx/count from environment variables, trying to get them from ATL
+2024:04:10-06:09:09:(33661) |CCL_WARN| fallback to 'sockets' mode of ze exchange mechanism, to use CCL_ZE_IPC_EXHANGE=drmfd, set CCL_LOCAL_RANK/SIZE explicitly  or use process launcher
+2024:04:10-06:09:09:(33661) |CCL_WARN| could not open the library: libfabric.so, error: libfabric.so: cannot open shared object file: No such file or directory
+2024:04:10-06:09:09:(33661) |CCL_WARN| OFI transport was not initialized, fallback to MPI transport
+----------------------------- Captured stderr call -----------------------------
+/usr/local/lib/python3.10/dist-packages/torchvision/io/image.py:13: UserWarning: Failed to load image Python extension: 'libpng16.so.16: cannot open shared object file: No such file or directory'If you don't plan on using image functionality from `torchvision.io`, you can ignore this warning. Otherwise, there might be something wrong with your environment. Did you have `libjpeg` or `libpng` installed before building `torchvision` from source?
+  warn(
+/usr/local/lib/python3.10/dist-packages/torchvision/io/image.py:13: UserWarning: Failed to load image Python extension: 'libpng16.so.16: cannot open shared object file: No such file or directory'If you don't plan on using image functionality from `torchvision.io`, you can ignore this warning. Otherwise, there might be something wrong with your environment. Did you have `libjpeg` or `libpng` installed before building `torchvision` from source?
+  warn(
+/usr/local/lib/python3.10/dist-packages/torchvision/io/image.py:13: UserWarning: Failed to load image Python extension: 'libpng16.so.16: cannot open shared object file: No such file or directory'If you don't plan on using image functionality from `torchvision.io`, you can ignore this warning. Otherwise, there might be something wrong with your environment. Did you have `libjpeg` or `libpng` installed before building `torchvision` from source?
+  warn(
+/usr/local/lib/python3.10/dist-packages/torchvision/io/image.py:13: UserWarning: Failed to load image Python extension: 'libpng16.so.16: cannot open shared object file: No such file or directory'If you don't plan on using image functionality from `torchvision.io`, you can ignore this warning. Otherwise, there might be something wrong with your environment. Did you have `libjpeg` or `libpng` installed before building `torchvision` from source?
+  warn(
+2024:04:10-06:09:09:(33664) |CCL_ERROR| atl_mpi_ctx.cpp:605 check_impi_env: CCL/MPI uses Intel(R) MPI Library but neither I_MPI_ROOT nor ONEAPI_ROOT is set. Please source release version of Intel(R) MPI Library (2019 or higher version).
+2024:04:10-06:09:09:(33664) |CCL_ERROR| atl_mpi_ctx.cpp:605 check_impi_env: CCL/MPI uses Intel(R) MPI Library but neither I_MPI_ROOT nor ONEAPI_ROOT is set. Please source release version of Intel(R) MPI Library (2019 or higher version).
+2024:04:10-06:09:09:(33663) |CCL_ERROR| atl_mpi_ctx.cpp:605 check_impi_env: CCL/MPI uses Intel(R) MPI Library but neither I_MPI_ROOT nor ONEAPI_ROOT is set. Please source release version of Intel(R) MPI Library (2019 or higher version).
+2024:04:10-06:09:09:(33663) |CCL_ERROR| atl_mpi_ctx.cpp:605 check_impi_env: CCL/MPI uses Intel(R) MPI Library but neither I_MPI_ROOT nor ONEAPI_ROOT is set. Please source release version of Intel(R) MPI Library (2019 or higher version).
+2024:04:10-06:09:09:(33662) |CCL_ERROR| atl_mpi_ctx.cpp:605 check_impi_env: CCL/MPI uses Intel(R) MPI Library but neither I_MPI_ROOT nor ONEAPI_ROOT is set. Please source release version of Intel(R) MPI Library (2019 or higher version).
+2024:04:10-06:09:09:(33662) |CCL_ERROR| atl_mpi_ctx.cpp:605 check_impi_env: CCL/MPI uses Intel(R) MPI Library but neither I_MPI_ROOT nor ONEAPI_ROOT is set. Please source release version of Intel(R) MPI Library (2019 or higher version).
+2024:04:10-06:09:09:(33661) |CCL_ERROR| atl_mpi_ctx.cpp:605 check_impi_env: CCL/MPI uses Intel(R) MPI Library but neither I_MPI_ROOT nor ONEAPI_ROOT is set. Please source release version of Intel(R) MPI Library (2019 or higher version).
+2024:04:10-06:09:09:(33661) |CCL_ERROR| atl_mpi_ctx.cpp:605 check_impi_env: CCL/MPI uses Intel(R) MPI Library but neither I_MPI_ROOT nor ONEAPI_ROOT is set. Please source release version of Intel(R) MPI Library (2019 or higher version).
+2024:04:10-06:09:09:(33661) |CCL_ERROR| atl_mpi_ctx.cpp:605 check_impi_env: CCL/MPI uses Intel(R) MPI Library but neither I_MPI_ROOT nor ONEAPI_ROOT is set. Please source release version of Intel(R) MPI Library (2019 or higher version).
+2024:04:10-06:09:09:(33661) |CCL_ERROR| atl_mpi_comm.cpp:87 init_transport: condition transport->init(nullptr, nullptr, &attr, nullptr, pmi) == ATL_STATUS_SUCCESS failed
+failed to initialize ATL2024:04:10-06:09:09:(33662) |CCL_ERROR| atl_mpi_ctx.cpp:605 check_impi_env: CCL/MPI uses Intel(R) MPI Library but neither I_MPI_ROOT nor ONEAPI_ROOT is set. Please source release version of Intel(R) MPI Library (2019 or higher version).2024:04:10-06:09:09:(33664) |CCL_ERROR| atl_mpi_ctx.cpp:605 check_impi_env: CCL/MPI uses Intel(R) MPI Library but neither I_MPI_ROOT nor ONEAPI_ROOT is set. Please source release version of Intel(R) MPI Library (2019 or higher version).2024:04:10-06:09:09:(33663) |CCL_ERROR| atl_mpi_ctx.cpp:605 check_impi_env: CCL/MPI uses Intel(R) MPI Library but neither I_MPI_ROOT nor ONEAPI_ROOT is set. Please source release version of Intel(R) MPI Library (2019 or higher version).
+
+
+
+2024:04:10-06:09:09:(33662) |CCL_ERROR| atl_mpi_comm.cpp:87 init_transport: condition transport->init(nullptr, nullptr, &attr, nullptr, pmi) == ATL_STATUS_SUCCESS failed
+failed to initialize ATL2024:04:10-06:09:09:(33664) |CCL_ERROR| atl_mpi_comm.cpp:87 init_transport: condition transport->init(nullptr, nullptr, &attr, nullptr, pmi) == ATL_STATUS_SUCCESS failed
+failed to initialize ATL2024:04:10-06:09:09:(33663) |CCL_ERROR| atl_mpi_comm.cpp:87 init_transport: condition transport->init(nullptr, nullptr, &attr, nullptr, pmi) == ATL_STATUS_SUCCESS failed
+failed to initialize ATL
+
+
+Process Process-69:
+Process Process-70:
+Process Process-72:
+Process Process-71:
+Traceback (most recent call last):
+  File "/usr/lib/python3.10/multiprocessing/process.py", line 314, in _bootstrap
+    self.run()
+  File "/usr/lib/python3.10/multiprocessing/process.py", line 108, in run
+    self._target(*self._args, **self._kwargs)
+  File "/DeepSpeed/tests/unit/common.py", line 284, in _dist_run
+    dist.barrier()
+  File "/DeepSpeed/deepspeed/comm/comm.py", line 117, in log_wrapper
+    return func(*args, **kwargs)
+  File "/DeepSpeed/deepspeed/comm/comm.py", line 408, in barrier
+    return cdb.barrier(group=group, async_op=async_op)
+  File "/usr/local/lib/python3.10/dist-packages/torch/_dynamo/eval_frame.py", line 328, in _fn
+    return fn(*args, **kwargs)
+Traceback (most recent call last):
+Traceback (most recent call last):
+  File "/DeepSpeed/deepspeed/comm/torch.py", line 335, in barrier
+    return torch.distributed.barrier(group=group, async_op=async_op, device_ids=device_ids)
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.10/dist-packages/torch/distributed/c10d_logger.py", line 47, in wrapper
+    return func(*args, **kwargs)
+  File "/usr/local/lib/python3.10/dist-packages/torch/distributed/distributed_c10d.py", line 3698, in barrier
+    work = group.barrier(opts=opts)
+RuntimeError: oneCCL: atl_mpi_comm.cpp:87 init_transport: EXCEPTION: failed to initialize ATL
+  File "/usr/lib/python3.10/multiprocessing/process.py", line 314, in _bootstrap
+    self.run()
+  File "/usr/lib/python3.10/multiprocessing/process.py", line 314, in _bootstrap
+    self.run()
+  File "/usr/lib/python3.10/multiprocessing/process.py", line 108, in run
+    self._target(*self._args, **self._kwargs)
+  File "/usr/lib/python3.10/multiprocessing/process.py", line 108, in run
+    self._target(*self._args, **self._kwargs)
+  File "/DeepSpeed/tests/unit/common.py", line 284, in _dist_run
+    dist.barrier()
+  File "/usr/lib/python3.10/multiprocessing/process.py", line 314, in _bootstrap
+    self.run()
+  File "/DeepSpeed/tests/unit/common.py", line 284, in _dist_run
+    dist.barrier()
+  File "/DeepSpeed/deepspeed/comm/comm.py", line 117, in log_wrapper
+    return func(*args, **kwargs)
+  File "/usr/lib/python3.10/multiprocessing/process.py", line 108, in run
+    self._target(*self._args, **self._kwargs)
+  File "/DeepSpeed/deepspeed/comm/comm.py", line 408, in barrier
+    return cdb.barrier(group=group, async_op=async_op)
+  File "/DeepSpeed/deepspeed/comm/comm.py", line 117, in log_wrapper
+    return func(*args, **kwargs)
+  File "/DeepSpeed/tests/unit/common.py", line 284, in _dist_run
+    dist.barrier()
+  File "/usr/local/lib/python3.10/dist-packages/torch/_dynamo/eval_frame.py", line 328, in _fn
+    return fn(*args, **kwargs)
+  File "/DeepSpeed/deepspeed/comm/comm.py", line 408, in barrier
+    return cdb.barrier(group=group, async_op=async_op)
+  File "/DeepSpeed/deepspeed/comm/comm.py", line 117, in log_wrapper
+    return func(*args, **kwargs)
+  File "/DeepSpeed/deepspeed/comm/torch.py", line 335, in barrier
+    return torch.distributed.barrier(group=group, async_op=async_op, device_ids=device_ids)
+  File "/usr/local/lib/python3.10/dist-packages/torch/_dynamo/eval_frame.py", line 328, in _fn
+    return fn(*args, **kwargs)
+  File "/DeepSpeed/deepspeed/comm/comm.py", line 408, in barrier
+    return cdb.barrier(group=group, async_op=async_op)
+  File "/usr/local/lib/python3.10/dist-packages/torch/distributed/c10d_logger.py", line 47, in wrapper
+    return func(*args, **kwargs)
+  File "/DeepSpeed/deepspeed/comm/torch.py", line 335, in barrier
+    return torch.distributed.barrier(group=group, async_op=async_op, device_ids=device_ids)
+  File "/usr/local/lib/python3.10/dist-packages/torch/distributed/distributed_c10d.py", line 3698, in barrier
+    work = group.barrier(opts=opts)
+  File "/usr/local/lib/python3.10/dist-packages/torch/_dynamo/eval_frame.py", line 328, in _fn
+    return fn(*args, **kwargs)
+  File "/usr/local/lib/python3.10/dist-packages/torch/distributed/c10d_logger.py", line 47, in wrapper
+    return func(*args, **kwargs)
+  File "/DeepSpeed/deepspeed/comm/torch.py", line 335, in barrier
+    return torch.distributed.barrier(group=group, async_op=async_op, device_ids=device_ids)
+  File "/usr/local/lib/python3.10/dist-packages/torch/distributed/distributed_c10d.py", line 3698, in barrier
+    work = group.barrier(opts=opts)
+  File "/usr/local/lib/python3.10/dist-packages/torch/distributed/c10d_logger.py", line 47, in wrapper
+    return func(*args, **kwargs)
+RuntimeError: oneCCL: atl_mpi_comm.cpp:87 init_transport: EXCEPTION: failed to initialize ATL
+  File "/usr/local/lib/python3.10/dist-packages/torch/distributed/distributed_c10d.py", line 3698, in barrier
+    work = group.barrier(opts=opts)
+RuntimeError: oneCCL: atl_mpi_comm.cpp:87 init_transport: EXCEPTION: failed to initialize ATL
+RuntimeError: oneCCL: atl_mpi_comm.cpp:87 init_transport: EXCEPTION: failed to initialize ATL
+[31m[1m___________ TestMoECheckpoint.test_checkpoint_moe_and_zero[4-False] ____________[0m
+Worker 0 exited with code 1
+----------------------------- Captured stdout call -----------------------------
+[2024-04-10 06:09:12,939] [INFO] [real_accelerator.py:203:get_accelerator] Setting ds_accelerator to xpu (auto detect)
+[2024-04-10 06:09:12,940] [INFO] [real_accelerator.py:203:get_accelerator] Setting ds_accelerator to xpu (auto detect)
+[2024-04-10 06:09:12,958] [INFO] [real_accelerator.py:203:get_accelerator] Setting ds_accelerator to xpu (auto detect)
+[2024-04-10 06:09:12,959] [INFO] [real_accelerator.py:203:get_accelerator] Setting ds_accelerator to xpu (auto detect)
+[2024-04-10 06:09:12,960] [INFO] [real_accelerator.py:203:get_accelerator] Setting ds_accelerator to xpu (auto detect)
+[2024-04-10 06:09:12,966] [INFO] [real_accelerator.py:203:get_accelerator] Setting ds_accelerator to xpu (auto detect)
+[2024-04-10 06:09:12,977] [INFO] [real_accelerator.py:203:get_accelerator] Setting ds_accelerator to xpu (auto detect)
+[2024-04-10 06:09:12,984] [INFO] [real_accelerator.py:203:get_accelerator] Setting ds_accelerator to xpu (auto detect)
+[93m [WARNING] [0m async_io requires the dev libaio .so object and headers but these were not found.
+[93m [WARNING] [0m async_io: please install the libaio-dev package with apt
+[93m [WARNING] [0m If libaio is already installed (perhaps from source), try setting the CFLAGS and LDFLAGS environment variables to where it can be found.
+[2024-04-10 06:09:13,766] [INFO] [comm.py:161:init_deepspeed_backend] Initialize ccl backend
+[2024-04-10 06:09:13,767] [INFO] [comm.py:637:init_distributed] cdb=None
+[93m [WARNING] [0m async_io requires the dev libaio .so object and headers but these were not found.
+[93m [WARNING] [0m async_io: please install the libaio-dev package with apt
+[93m [WARNING] [0m If libaio is already installed (perhaps from source), try setting the CFLAGS and LDFLAGS environment variables to where it can be found.
+[2024-04-10 06:09:13,792] [INFO] [comm.py:161:init_deepspeed_backend] Initialize ccl backend
+[2024-04-10 06:09:13,792] [INFO] [comm.py:637:init_distributed] cdb=None
+[93m [WARNING] [0m async_io requires the dev libaio .so object and headers but these were not found.
+[93m [WARNING] [0m async_io: please install the libaio-dev package with apt
+[93m [WARNING] [0m If libaio is already installed (perhaps from source), try setting the CFLAGS and LDFLAGS environment variables to where it can be found.
+[2024-04-10 06:09:13,814] [INFO] [comm.py:161:init_deepspeed_backend] Initialize ccl backend
+[2024-04-10 06:09:13,814] [INFO] [comm.py:637:init_distributed] cdb=None
+[2024-04-10 06:09:13,814] [INFO] [comm.py:668:init_distributed] Initializing TorchBackend in DeepSpeed with backend ccl
+[93m [WARNING] [0m async_io requires the dev libaio .so object and headers but these were not found.
+[93m [WARNING] [0m async_io: please install the libaio-dev package with apt
+[93m [WARNING] [0m If libaio is already installed (perhaps from source), try setting the CFLAGS and LDFLAGS environment variables to where it can be found.
+[2024-04-10 06:09:13,830] [INFO] [comm.py:161:init_deepspeed_backend] Initialize ccl backend
+[2024-04-10 06:09:13,830] [INFO] [comm.py:637:init_distributed] cdb=None
+2024:04:10-06:09:13:(35383) |CCL_WARN| did not find MPI-launcher specific variables, switch to ATL/OFI, to force enable ATL/MPI set CCL_ATL_TRANSPORT=mpi
+2024:04:10-06:09:13:(35383) |CCL_WARN| could not get local_idx/count from environment variables, trying to get them from ATL
+2024:04:10-06:09:13:(35383) |CCL_WARN| fallback to 'sockets' mode of ze exchange mechanism, to use CCL_ZE_IPC_EXHANGE=drmfd, set CCL_LOCAL_RANK/SIZE explicitly  or use process launcher
+2024:04:10-06:09:13:(35383) |CCL_WARN| could not open the library: libfabric.so, error: libfabric.so: cannot open shared object file: No such file or directory
+2024:04:10-06:09:13:(35383) |CCL_WARN| OFI transport was not initialized, fallback to MPI transport
+2024:04:10-06:09:14:(35385) |CCL_WARN| did not find MPI-launcher specific variables, switch to ATL/OFI, to force enable ATL/MPI set CCL_ATL_TRANSPORT=mpi
+2024:04:10-06:09:14:(35385) |CCL_WARN| could not get local_idx/count from environment variables, trying to get them from ATL
+2024:04:10-06:09:14:(35385) |CCL_WARN| fallback to 'sockets' mode of ze exchange mechanism, to use CCL_ZE_IPC_EXHANGE=drmfd, set CCL_LOCAL_RANK/SIZE explicitly  or use process launcher
+2024:04:10-06:09:14:(35385) |CCL_WARN| could not open the library: libfabric.so, error: libfabric.so: cannot open shared object file: No such file or directory
+2024:04:10-06:09:14:(35385) |CCL_WARN| OFI transport was not initialized, fallback to MPI transport
+2024:04:10-06:09:14:(35384) |CCL_WARN| did not find MPI-launcher specific variables, switch to ATL/OFI, to force enable ATL/MPI set CCL_ATL_TRANSPORT=mpi
+2024:04:10-06:09:14:(35384) |CCL_WARN| could not get local_idx/count from environment variables, trying to get them from ATL
+2024:04:10-06:09:14:(35384) |CCL_WARN| fallback to 'sockets' mode of ze exchange mechanism, to use CCL_ZE_IPC_EXHANGE=drmfd, set CCL_LOCAL_RANK/SIZE explicitly  or use process launcher
+2024:04:10-06:09:14:(35384) |CCL_WARN| could not open the library: libfabric.so, error: libfabric.so: cannot open shared object file: No such file or directory
+2024:04:10-06:09:14:(35384) |CCL_WARN| OFI transport was not initialized, fallback to MPI transport
+2024:04:10-06:09:14:(35382) |CCL_WARN| did not find MPI-launcher specific variables, switch to ATL/OFI, to force enable ATL/MPI set CCL_ATL_TRANSPORT=mpi
+2024:04:10-06:09:14:(35382) |CCL_WARN| could not get local_idx/count from environment variables, trying to get them from ATL
+2024:04:10-06:09:14:(35382) |CCL_WARN| fallback to 'sockets' mode of ze exchange mechanism, to use CCL_ZE_IPC_EXHANGE=drmfd, set CCL_LOCAL_RANK/SIZE explicitly  or use process launcher
+2024:04:10-06:09:14:(35382) |CCL_WARN| could not open the library: libfabric.so, error: libfabric.so: cannot open shared object file: No such file or directory
+2024:04:10-06:09:14:(35382) |CCL_WARN| OFI transport was not initialized, fallback to MPI transport
+----------------------------- Captured stderr call -----------------------------
+/usr/local/lib/python3.10/dist-packages/torchvision/io/image.py:13: UserWarning: Failed to load image Python extension: 'libpng16.so.16: cannot open shared object file: No such file or directory'If you don't plan on using image functionality from `torchvision.io`, you can ignore this warning. Otherwise, there might be something wrong with your environment. Did you have `libjpeg` or `libpng` installed before building `torchvision` from source?
+  warn(
+/usr/local/lib/python3.10/dist-packages/torchvision/io/image.py:13: UserWarning: Failed to load image Python extension: 'libpng16.so.16: cannot open shared object file: No such file or directory'If you don't plan on using image functionality from `torchvision.io`, you can ignore this warning. Otherwise, there might be something wrong with your environment. Did you have `libjpeg` or `libpng` installed before building `torchvision` from source?
+  warn(
+/usr/local/lib/python3.10/dist-packages/torchvision/io/image.py:13: UserWarning: Failed to load image Python extension: 'libpng16.so.16: cannot open shared object file: No such file or directory'If you don't plan on using image functionality from `torchvision.io`, you can ignore this warning. Otherwise, there might be something wrong with your environment. Did you have `libjpeg` or `libpng` installed before building `torchvision` from source?
+  warn(
+/usr/local/lib/python3.10/dist-packages/torchvision/io/image.py:13: UserWarning: Failed to load image Python extension: 'libpng16.so.16: cannot open shared object file: No such file or directory'If you don't plan on using image functionality from `torchvision.io`, you can ignore this warning. Otherwise, there might be something wrong with your environment. Did you have `libjpeg` or `libpng` installed before building `torchvision` from source?
+  warn(
+2024:04:10-06:09:13:(35383) |CCL_ERROR| atl_mpi_ctx.cpp:605 check_impi_env: CCL/MPI uses Intel(R) MPI Library but neither I_MPI_ROOT nor ONEAPI_ROOT is set. Please source release version of Intel(R) MPI Library (2019 or higher version).
+2024:04:10-06:09:13:(35383) |CCL_ERROR| atl_mpi_ctx.cpp:605 check_impi_env: CCL/MPI uses Intel(R) MPI Library but neither I_MPI_ROOT nor ONEAPI_ROOT is set. Please source release version of Intel(R) MPI Library (2019 or higher version).
+2024:04:10-06:09:14:(35385) |CCL_ERROR| atl_mpi_ctx.cpp:605 check_impi_env: CCL/MPI uses Intel(R) MPI Library but neither I_MPI_ROOT nor ONEAPI_ROOT is set. Please source release version of Intel(R) MPI Library (2019 or higher version).
+2024:04:10-06:09:14:(35385) |CCL_ERROR| atl_mpi_ctx.cpp:605 check_impi_env: CCL/MPI uses Intel(R) MPI Library but neither I_MPI_ROOT nor ONEAPI_ROOT is set. Please source release version of Intel(R) MPI Library (2019 or higher version).
+2024:04:10-06:09:14:(35384) |CCL_ERROR| atl_mpi_ctx.cpp:605 check_impi_env: CCL/MPI uses Intel(R) MPI Library but neither I_MPI_ROOT nor ONEAPI_ROOT is set. Please source release version of Intel(R) MPI Library (2019 or higher version).
+2024:04:10-06:09:14:(35384) |CCL_ERROR| atl_mpi_ctx.cpp:605 check_impi_env: CCL/MPI uses Intel(R) MPI Library but neither I_MPI_ROOT nor ONEAPI_ROOT is set. Please source release version of Intel(R) MPI Library (2019 or higher version).
+2024:04:10-06:09:14:(35382) |CCL_ERROR| atl_mpi_ctx.cpp:605 check_impi_env: CCL/MPI uses Intel(R) MPI Library but neither I_MPI_ROOT nor ONEAPI_ROOT is set. Please source release version of Intel(R) MPI Library (2019 or higher version).
+2024:04:10-06:09:14:(35382) |CCL_ERROR| atl_mpi_ctx.cpp:605 check_impi_env: CCL/MPI uses Intel(R) MPI Library but neither I_MPI_ROOT nor ONEAPI_ROOT is set. Please source release version of Intel(R) MPI Library (2019 or higher version).
+2024:04:10-06:09:15:(35382) |CCL_ERROR| atl_mpi_ctx.cpp:605 check_impi_env: CCL/MPI uses Intel(R) MPI Library but neither I_MPI_ROOT nor ONEAPI_ROOT is set. Please source release version of Intel(R) MPI Library (2019 or higher version).2024:04:10-06:09:15:(35383) |CCL_ERROR| atl_mpi_ctx.cpp:605 check_impi_env: CCL/MPI uses Intel(R) MPI Library but neither I_MPI_ROOT nor ONEAPI_ROOT is set. Please source release version of Intel(R) MPI Library (2019 or higher version).2024:04:10-06:09:15:(35385) |CCL_ERROR| atl_mpi_ctx.cpp:605 check_impi_env: CCL/MPI uses Intel(R) MPI Library but neither I_MPI_ROOT nor ONEAPI_ROOT is set. Please source release version of Intel(R) MPI Library (2019 or higher version).2024:04:10-06:09:15:(35384) |CCL_ERROR| atl_mpi_ctx.cpp:605 check_impi_env: CCL/MPI uses Intel(R) MPI Library but neither I_MPI_ROOT nor ONEAPI_ROOT is set. Please source release version of Intel(R) MPI Library (2019 or higher version).
+
+
+
+2024:04:10-06:09:15:(35382) |CCL_ERROR| atl_mpi_comm.cpp:87 init_transport: condition transport->init(nullptr, nullptr, &attr, nullptr, pmi) == ATL_STATUS_SUCCESS failed
+failed to initialize ATL2024:04:10-06:09:15:(35383) |CCL_ERROR| atl_mpi_comm.cpp:87 init_transport: condition transport->init(nullptr, nullptr, &attr, nullptr, pmi) == ATL_STATUS_SUCCESS failed
+failed to initialize ATL2024:04:10-06:09:15:(35385) |CCL_ERROR| atl_mpi_comm.cpp:87 init_transport: condition transport->init(nullptr, nullptr, &attr, nullptr, pmi) == ATL_STATUS_SUCCESS failed
+failed to initialize ATL2024:04:10-06:09:15:(35384) |CCL_ERROR| atl_mpi_comm.cpp:87 init_transport: condition transport->init(nullptr, nullptr, &attr, nullptr, pmi) == ATL_STATUS_SUCCESS failed
+failed to initialize ATL
+
+
+
+Process Process-75:
+Process Process-73:
+Process Process-74:
+Process Process-76:
+Traceback (most recent call last):
+Traceback (most recent call last):
+Traceback (most recent call last):
+  File "/usr/lib/python3.10/multiprocessing/process.py", line 314, in _bootstrap
+    self.run()
+Traceback (most recent call last):
+  File "/usr/lib/python3.10/multiprocessing/process.py", line 108, in run
+    self._target(*self._args, **self._kwargs)
+  File "/DeepSpeed/tests/unit/common.py", line 284, in _dist_run
+    dist.barrier()
+  File "/DeepSpeed/deepspeed/comm/comm.py", line 117, in log_wrapper
+    return func(*args, **kwargs)
+  File "/DeepSpeed/deepspeed/comm/comm.py", line 408, in barrier
+    return cdb.barrier(group=group, async_op=async_op)
+  File "/usr/local/lib/python3.10/dist-packages/torch/_dynamo/eval_frame.py", line 328, in _fn
+    return fn(*args, **kwargs)
+  File "/DeepSpeed/deepspeed/comm/torch.py", line 335, in barrier
+    return torch.distributed.barrier(group=group, async_op=async_op, device_ids=device_ids)
+  File "/usr/local/lib/python3.10/dist-packages/torch/distributed/c10d_logger.py", line 47, in wrapper
+    return func(*args, **kwargs)
+  File "/usr/local/lib/python3.10/dist-packages/torch/distributed/distributed_c10d.py", line 3698, in barrier
+    work = group.barrier(opts=opts)
+  File "/usr/lib/python3.10/multiprocessing/process.py", line 314, in _bootstrap
+    self.run()
+  File "/usr/lib/python3.10/multiprocessing/process.py", line 314, in _bootstrap
+    self.run()
+  File "/usr/lib/python3.10/multiprocessing/process.py", line 108, in run
+    self._target(*self._args, **self._kwargs)
+  File "/usr/lib/python3.10/multiprocessing/process.py", line 314, in _bootstrap
+    self.run()
+RuntimeError: oneCCL: atl_mpi_comm.cpp:87 init_transport: EXCEPTION: failed to initialize ATL
+  File "/usr/lib/python3.10/multiprocessing/process.py", line 108, in run
+    self._target(*self._args, **self._kwargs)
+  File "/DeepSpeed/tests/unit/common.py", line 284, in _dist_run
+    dist.barrier()
+  File "/usr/lib/python3.10/multiprocessing/process.py", line 108, in run
+    self._target(*self._args, **self._kwargs)
+  File "/DeepSpeed/tests/unit/common.py", line 284, in _dist_run
+    dist.barrier()
+  File "/DeepSpeed/deepspeed/comm/comm.py", line 117, in log_wrapper
+    return func(*args, **kwargs)
+  File "/DeepSpeed/deepspeed/comm/comm.py", line 117, in log_wrapper
+    return func(*args, **kwargs)
+  File "/DeepSpeed/tests/unit/common.py", line 284, in _dist_run
+    dist.barrier()
+  File "/DeepSpeed/deepspeed/comm/comm.py", line 408, in barrier
+    return cdb.barrier(group=group, async_op=async_op)
+  File "/DeepSpeed/deepspeed/comm/comm.py", line 408, in barrier
+    return cdb.barrier(group=group, async_op=async_op)
+  File "/DeepSpeed/deepspeed/comm/comm.py", line 117, in log_wrapper
+    return func(*args, **kwargs)
+  File "/usr/local/lib/python3.10/dist-packages/torch/_dynamo/eval_frame.py", line 328, in _fn
+    return fn(*args, **kwargs)
+  File "/usr/local/lib/python3.10/dist-packages/torch/_dynamo/eval_frame.py", line 328, in _fn
+    return fn(*args, **kwargs)
+  File "/DeepSpeed/deepspeed/comm/comm.py", line 408, in barrier
+    return cdb.barrier(group=group, async_op=async_op)
+  File "/DeepSpeed/deepspeed/comm/torch.py", line 335, in barrier
+    return torch.distributed.barrier(group=group, async_op=async_op, device_ids=device_ids)
+  File "/DeepSpeed/deepspeed/comm/torch.py", line 335, in barrier
+    return torch.distributed.barrier(group=group, async_op=async_op, device_ids=device_ids)
+  File "/usr/local/lib/python3.10/dist-packages/torch/_dynamo/eval_frame.py", line 328, in _fn
+    return fn(*args, **kwargs)
+  File "/usr/local/lib/python3.10/dist-packages/torch/distributed/c10d_logger.py", line 47, in wrapper
+    return func(*args, **kwargs)
+  File "/usr/local/lib/python3.10/dist-packages/torch/distributed/c10d_logger.py", line 47, in wrapper
+    return func(*args, **kwargs)
+  File "/DeepSpeed/deepspeed/comm/torch.py", line 335, in barrier
+    return torch.distributed.barrier(group=group, async_op=async_op, device_ids=device_ids)
+  File "/usr/local/lib/python3.10/dist-packages/torch/distributed/distributed_c10d.py", line 3698, in barrier
+    work = group.barrier(opts=opts)
+  File "/usr/local/lib/python3.10/dist-packages/torch/distributed/distributed_c10d.py", line 3698, in barrier
+    work = group.barrier(opts=opts)
+  File "/usr/local/lib/python3.10/dist-packages/torch/distributed/c10d_logger.py", line 47, in wrapper
+    return func(*args, **kwargs)
+  File "/usr/local/lib/python3.10/dist-packages/torch/distributed/distributed_c10d.py", line 3698, in barrier
+    work = group.barrier(opts=opts)
+RuntimeError: oneCCL: atl_mpi_comm.cpp:87 init_transport: EXCEPTION: failed to initialize ATL
+RuntimeError: oneCCL: atl_mpi_comm.cpp:87 init_transport: EXCEPTION: failed to initialize ATL
+RuntimeError: oneCCL: atl_mpi_comm.cpp:87 init_transport: EXCEPTION: failed to initialize ATL
+[31m[1m____________ TestMoECheckpoint.test_checkpoint_moe_and_zero[2-True] ____________[0m
+Worker 0 exited with code 1
+----------------------------- Captured stdout call -----------------------------
+[2024-04-10 06:09:18,298] [INFO] [real_accelerator.py:203:get_accelerator] Setting ds_accelerator to xpu (auto detect)
+[2024-04-10 06:09:18,301] [INFO] [real_accelerator.py:203:get_accelerator] Setting ds_accelerator to xpu (auto detect)
+[2024-04-10 06:09:18,316] [INFO] [real_accelerator.py:203:get_accelerator] Setting ds_accelerator to xpu (auto detect)
+[2024-04-10 06:09:18,318] [INFO] [real_accelerator.py:203:get_accelerator] Setting ds_accelerator to xpu (auto detect)
+[2024-04-10 06:09:18,356] [INFO] [real_accelerator.py:203:get_accelerator] Setting ds_accelerator to xpu (auto detect)
+[2024-04-10 06:09:18,374] [INFO] [real_accelerator.py:203:get_accelerator] Setting ds_accelerator to xpu (auto detect)
+[2024-04-10 06:09:18,375] [INFO] [real_accelerator.py:203:get_accelerator] Setting ds_accelerator to xpu (auto detect)
+[2024-04-10 06:09:18,392] [INFO] [real_accelerator.py:203:get_accelerator] Setting ds_accelerator to xpu (auto detect)
+[93m [WARNING] [0m async_io requires the dev libaio .so object and headers but these were not found.
+[93m [WARNING] [0m async_io: please install the libaio-dev package with apt
+[93m [WARNING] [0m If libaio is already installed (perhaps from source), try setting the CFLAGS and LDFLAGS environment variables to where it can be found.
+[2024-04-10 06:09:19,202] [INFO] [comm.py:161:init_deepspeed_backend] Initialize ccl backend
+[2024-04-10 06:09:19,203] [INFO] [comm.py:637:init_distributed] cdb=None
+[2024-04-10 06:09:19,203] [INFO] [comm.py:668:init_distributed] Initializing TorchBackend in DeepSpeed with backend ccl
+[93m [WARNING] [0m async_io requires the dev libaio .so object and headers but these were not found.
+[93m [WARNING] [0m async_io: please install the libaio-dev package with apt
+[93m [WARNING] [0m If libaio is already installed (perhaps from source), try setting the CFLAGS and LDFLAGS environment variables to where it can be found.
+[2024-04-10 06:09:19,242] [INFO] [comm.py:161:init_deepspeed_backend] Initialize ccl backend
+[2024-04-10 06:09:19,242] [INFO] [comm.py:637:init_distributed] cdb=None
+2024:04:10-06:09:19:(37105) |CCL_WARN| did not find MPI-launcher specific variables, switch to ATL/OFI, to force enable ATL/MPI set CCL_ATL_TRANSPORT=mpi
+2024:04:10-06:09:19:(37105) |CCL_WARN| could not get local_idx/count from environment variables, trying to get them from ATL
+2024:04:10-06:09:19:(37105) |CCL_WARN| fallback to 'sockets' mode of ze exchange mechanism, to use CCL_ZE_IPC_EXHANGE=drmfd, set CCL_LOCAL_RANK/SIZE explicitly  or use process launcher
+2024:04:10-06:09:19:(37105) |CCL_WARN| could not open the library: libfabric.so, error: libfabric.so: cannot open shared object file: No such file or directory
+2024:04:10-06:09:19:(37105) |CCL_WARN| OFI transport was not initialized, fallback to MPI transport
+[93m [WARNING] [0m async_io requires the dev libaio .so object and headers but these were not found.
+[93m [WARNING] [0m async_io: please install the libaio-dev package with apt
+[93m [WARNING] [0m If libaio is already installed (perhaps from source), try setting the CFLAGS and LDFLAGS environment variables to where it can be found.
+[2024-04-10 06:09:19,258] [INFO] [comm.py:161:init_deepspeed_backend] Initialize ccl backend
+[2024-04-10 06:09:19,258] [INFO] [comm.py:637:init_distributed] cdb=None
+2024:04:10-06:09:19:(37106) |CCL_WARN| did not find MPI-launcher specific variables, switch to ATL/OFI, to force enable ATL/MPI set CCL_ATL_TRANSPORT=mpi
+2024:04:10-06:09:19:(37106) |CCL_WARN| could not get local_idx/count from environment variables, trying to get them from ATL
+2024:04:10-06:09:19:(37106) |CCL_WARN| fallback to 'sockets' mode of ze exchange mechanism, to use CCL_ZE_IPC_EXHANGE=drmfd, set CCL_LOCAL_RANK/SIZE explicitly  or use process launcher
+2024:04:10-06:09:19:(37106) |CCL_WARN| could not open the library: libfabric.so, error: libfabric.so: cannot open shared object file: No such file or directory
+2024:04:10-06:09:19:(37106) |CCL_WARN| OFI transport was not initialized, fallback to MPI transport
+[93m [WARNING] [0m async_io requires the dev libaio .so object and headers but these were not found.
+[93m [WARNING] [0m async_io: please install the libaio-dev package with apt
+[93m [WARNING] [0m If libaio is already installed (perhaps from source), try setting the CFLAGS and LDFLAGS environment variables to where it can be found.
+[2024-04-10 06:09:19,309] [INFO] [comm.py:161:init_deepspeed_backend] Initialize ccl backend
+[2024-04-10 06:09:19,309] [INFO] [comm.py:637:init_distributed] cdb=None
+2024:04:10-06:09:19:(37104) |CCL_WARN| did not find MPI-launcher specific variables, switch to ATL/OFI, to force enable ATL/MPI set CCL_ATL_TRANSPORT=mpi
+2024:04:10-06:09:19:(37104) |CCL_WARN| could not get local_idx/count from environment variables, trying to get them from ATL
+2024:04:10-06:09:19:(37104) |CCL_WARN| fallback to 'sockets' mode of ze exchange mechanism, to use CCL_ZE_IPC_EXHANGE=drmfd, set CCL_LOCAL_RANK/SIZE explicitly  or use process launcher
+2024:04:10-06:09:19:(37104) |CCL_WARN| could not open the library: libfabric.so, error: libfabric.so: cannot open shared object file: No such file or directory
+2024:04:10-06:09:19:(37104) |CCL_WARN| OFI transport was not initialized, fallback to MPI transport
+2024:04:10-06:09:19:(37103) |CCL_WARN| did not find MPI-launcher specific variables, switch to ATL/OFI, to force enable ATL/MPI set CCL_ATL_TRANSPORT=mpi
+2024:04:10-06:09:19:(37103) |CCL_WARN| could not get local_idx/count from environment variables, trying to get them from ATL
+2024:04:10-06:09:19:(37103) |CCL_WARN| fallback to 'sockets' mode of ze exchange mechanism, to use CCL_ZE_IPC_EXHANGE=drmfd, set CCL_LOCAL_RANK/SIZE explicitly  or use process launcher
+2024:04:10-06:09:19:(37103) |CCL_WARN| could not open the library: libfabric.so, error: libfabric.so: cannot open shared object file: No such file or directory
+2024:04:10-06:09:19:(37103) |CCL_WARN| OFI transport was not initialized, fallback to MPI transport
+----------------------------- Captured stderr call -----------------------------
+/usr/local/lib/python3.10/dist-packages/torchvision/io/image.py:13: UserWarning: Failed to load image Python extension: 'libpng16.so.16: cannot open shared object file: No such file or directory'If you don't plan on using image functionality from `torchvision.io`, you can ignore this warning. Otherwise, there might be something wrong with your environment. Did you have `libjpeg` or `libpng` installed before building `torchvision` from source?
+  warn(
+/usr/local/lib/python3.10/dist-packages/torchvision/io/image.py:13: UserWarning: Failed to load image Python extension: 'libpng16.so.16: cannot open shared object file: No such file or directory'If you don't plan on using image functionality from `torchvision.io`, you can ignore this warning. Otherwise, there might be something wrong with your environment. Did you have `libjpeg` or `libpng` installed before building `torchvision` from source?
+  warn(
+/usr/local/lib/python3.10/dist-packages/torchvision/io/image.py:13: UserWarning: Failed to load image Python extension: 'libpng16.so.16: cannot open shared object file: No such file or directory'If you don't plan on using image functionality from `torchvision.io`, you can ignore this warning. Otherwise, there might be something wrong with your environment. Did you have `libjpeg` or `libpng` installed before building `torchvision` from source?
+  warn(
+/usr/local/lib/python3.10/dist-packages/torchvision/io/image.py:13: UserWarning: Failed to load image Python extension: 'libpng16.so.16: cannot open shared object file: No such file or directory'If you don't plan on using image functionality from `torchvision.io`, you can ignore this warning. Otherwise, there might be something wrong with your environment. Did you have `libjpeg` or `libpng` installed before building `torchvision` from source?
+  warn(
+2024:04:10-06:09:19:(37105) |CCL_ERROR| atl_mpi_ctx.cpp:605 check_impi_env: CCL/MPI uses Intel(R) MPI Library but neither I_MPI_ROOT nor ONEAPI_ROOT is set. Please source release version of Intel(R) MPI Library (2019 or higher version).
+2024:04:10-06:09:19:(37105) |CCL_ERROR| atl_mpi_ctx.cpp:605 check_impi_env: CCL/MPI uses Intel(R) MPI Library but neither I_MPI_ROOT nor ONEAPI_ROOT is set. Please source release version of Intel(R) MPI Library (2019 or higher version).
+2024:04:10-06:09:19:(37106) |CCL_ERROR| atl_mpi_ctx.cpp:605 check_impi_env: CCL/MPI uses Intel(R) MPI Library but neither I_MPI_ROOT nor ONEAPI_ROOT is set. Please source release version of Intel(R) MPI Library (2019 or higher version).
+2024:04:10-06:09:19:(37106) |CCL_ERROR| atl_mpi_ctx.cpp:605 check_impi_env: CCL/MPI uses Intel(R) MPI Library but neither I_MPI_ROOT nor ONEAPI_ROOT is set. Please source release version of Intel(R) MPI Library (2019 or higher version).
+2024:04:10-06:09:19:(37104) |CCL_ERROR| atl_mpi_ctx.cpp:605 check_impi_env: CCL/MPI uses Intel(R) MPI Library but neither I_MPI_ROOT nor ONEAPI_ROOT is set. Please source release version of Intel(R) MPI Library (2019 or higher version).
+2024:04:10-06:09:19:(37104) |CCL_ERROR| atl_mpi_ctx.cpp:605 check_impi_env: CCL/MPI uses Intel(R) MPI Library but neither I_MPI_ROOT nor ONEAPI_ROOT is set. Please source release version of Intel(R) MPI Library (2019 or higher version).
+2024:04:10-06:09:19:(37103) |CCL_ERROR| atl_mpi_ctx.cpp:605 check_impi_env: CCL/MPI uses Intel(R) MPI Library but neither I_MPI_ROOT nor ONEAPI_ROOT is set. Please source release version of Intel(R) MPI Library (2019 or higher version).
+2024:04:10-06:09:19:(37103) |CCL_ERROR| atl_mpi_ctx.cpp:605 check_impi_env: CCL/MPI uses Intel(R) MPI Library but neither I_MPI_ROOT nor ONEAPI_ROOT is set. Please source release version of Intel(R) MPI Library (2019 or higher version).
+2024:04:10-06:09:19:(37103) |CCL_ERROR| atl_mpi_ctx.cpp:605 check_impi_env: CCL/MPI uses Intel(R) MPI Library but neither I_MPI_ROOT nor ONEAPI_ROOT is set. Please source release version of Intel(R) MPI Library (2019 or higher version).
+2024:04:10-06:09:19:(37103) |CCL_ERROR| atl_mpi_comm.cpp:87 init_transport: condition transport->init(nullptr, nullptr, &attr, nullptr, pmi) == ATL_STATUS_SUCCESS failed
+failed to initialize ATL2024:04:10-06:09:19:(37104) |CCL_ERROR| atl_mpi_ctx.cpp:605 check_impi_env: CCL/MPI uses Intel(R) MPI Library but neither I_MPI_ROOT nor ONEAPI_ROOT is set. Please source release version of Intel(R) MPI Library (2019 or higher version).2024:04:10-06:09:19:(37106) |CCL_ERROR| atl_mpi_ctx.cpp:605 check_impi_env: CCL/MPI uses Intel(R) MPI Library but neither I_MPI_ROOT nor ONEAPI_ROOT is set. Please source release version of Intel(R) MPI Library (2019 or higher version).
+2024:04:10-06:09:19:(37105) |CCL_ERROR| atl_mpi_ctx.cpp:605 check_impi_env: CCL/MPI uses Intel(R) MPI Library but neither I_MPI_ROOT nor ONEAPI_ROOT is set. Please source release version of Intel(R) MPI Library (2019 or higher version).
+
+
+2024:04:10-06:09:19:(37104) |CCL_ERROR| atl_mpi_comm.cpp:87 init_transport: condition transport->init(nullptr, nullptr, &attr, nullptr, pmi) == ATL_STATUS_SUCCESS failed
+failed to initialize ATL2024:04:10-06:09:19:(37106) |CCL_ERROR| atl_mpi_comm.cpp:87 init_transport: condition transport->init(nullptr, nullptr, &attr, nullptr, pmi) == ATL_STATUS_SUCCESS failed
+failed to initialize ATL
+2024:04:10-06:09:19:(37105) |CCL_ERROR| atl_mpi_comm.cpp:87 init_transport: condition transport->init(nullptr, nullptr, &attr, nullptr, pmi) == ATL_STATUS_SUCCESS failed
+failed to initialize ATL
+
+Process Process-77:
+Process Process-78:
+Process Process-80:
+Process Process-79:
+Traceback (most recent call last):
+Traceback (most recent call last):
+  File "/usr/lib/python3.10/multiprocessing/process.py", line 314, in _bootstrap
+    self.run()
+  File "/usr/lib/python3.10/multiprocessing/process.py", line 108, in run
+    self._target(*self._args, **self._kwargs)
+  File "/DeepSpeed/tests/unit/common.py", line 284, in _dist_run
+    dist.barrier()
+  File "/DeepSpeed/deepspeed/comm/comm.py", line 117, in log_wrapper
+    return func(*args, **kwargs)
+  File "/DeepSpeed/deepspeed/comm/comm.py", line 408, in barrier
+    return cdb.barrier(group=group, async_op=async_op)
+  File "/usr/local/lib/python3.10/dist-packages/torch/_dynamo/eval_frame.py", line 328, in _fn
+    return fn(*args, **kwargs)
+Traceback (most recent call last):
+  File "/usr/lib/python3.10/multiprocessing/process.py", line 314, in _bootstrap
+    self.run()
+  File "/DeepSpeed/deepspeed/comm/torch.py", line 335, in barrier
+    return torch.distributed.barrier(group=group, async_op=async_op, device_ids=device_ids)
+  File "/usr/lib/python3.10/multiprocessing/process.py", line 108, in run
+    self._target(*self._args, **self._kwargs)
+  File "/usr/local/lib/python3.10/dist-packages/torch/distributed/c10d_logger.py", line 47, in wrapper
+    return func(*args, **kwargs)
+  File "/DeepSpeed/tests/unit/common.py", line 284, in _dist_run
+    dist.barrier()
+  File "/usr/local/lib/python3.10/dist-packages/torch/distributed/distributed_c10d.py", line 3698, in barrier
+    work = group.barrier(opts=opts)
+  File "/DeepSpeed/deepspeed/comm/comm.py", line 117, in log_wrapper
+    return func(*args, **kwargs)
+  File "/DeepSpeed/deepspeed/comm/comm.py", line 408, in barrier
+    return cdb.barrier(group=group, async_op=async_op)
+  File "/usr/local/lib/python3.10/dist-packages/torch/_dynamo/eval_frame.py", line 328, in _fn
+    return fn(*args, **kwargs)
+RuntimeError: oneCCL: atl_mpi_comm.cpp:87 init_transport: EXCEPTION: failed to initialize ATL
+  File "/DeepSpeed/deepspeed/comm/torch.py", line 335, in barrier
+    return torch.distributed.barrier(group=group, async_op=async_op, device_ids=device_ids)
+  File "/usr/local/lib/python3.10/dist-packages/torch/distributed/c10d_logger.py", line 47, in wrapper
+    return func(*args, **kwargs)
+  File "/usr/local/lib/python3.10/dist-packages/torch/distributed/distributed_c10d.py", line 3698, in barrier
+    work = group.barrier(opts=opts)
+  File "/usr/lib/python3.10/multiprocessing/process.py", line 314, in _bootstrap
+    self.run()
+  File "/usr/lib/python3.10/multiprocessing/process.py", line 108, in run
+    self._target(*self._args, **self._kwargs)
+  File "/DeepSpeed/tests/unit/common.py", line 284, in _dist_run
+    dist.barrier()
+RuntimeError: oneCCL: atl_mpi_comm.cpp:87 init_transport: EXCEPTION: failed to initialize ATL
+  File "/DeepSpeed/deepspeed/comm/comm.py", line 117, in log_wrapper
+    return func(*args, **kwargs)
+  File "/DeepSpeed/deepspeed/comm/comm.py", line 408, in barrier
+    return cdb.barrier(group=group, async_op=async_op)
+  File "/usr/local/lib/python3.10/dist-packages/torch/_dynamo/eval_frame.py", line 328, in _fn
+    return fn(*args, **kwargs)
+  File "/DeepSpeed/deepspeed/comm/torch.py", line 335, in barrier
+    return torch.distributed.barrier(group=group, async_op=async_op, device_ids=device_ids)
+  File "/usr/local/lib/python3.10/dist-packages/torch/distributed/c10d_logger.py", line 47, in wrapper
+    return func(*args, **kwargs)
+  File "/usr/local/lib/python3.10/dist-packages/torch/distributed/distributed_c10d.py", line 3698, in barrier
+    work = group.barrier(opts=opts)
+RuntimeError: oneCCL: atl_mpi_comm.cpp:87 init_transport: EXCEPTION: failed to initialize ATL
+Traceback (most recent call last):
+  File "/usr/lib/python3.10/multiprocessing/process.py", line 314, in _bootstrap
+    self.run()
+  File "/usr/lib/python3.10/multiprocessing/process.py", line 108, in run
+    self._target(*self._args, **self._kwargs)
+  File "/DeepSpeed/tests/unit/common.py", line 284, in _dist_run
+    dist.barrier()
+  File "/DeepSpeed/deepspeed/comm/comm.py", line 117, in log_wrapper
+    return func(*args, **kwargs)
+  File "/DeepSpeed/deepspeed/comm/comm.py", line 408, in barrier
+    return cdb.barrier(group=group, async_op=async_op)
+  File "/usr/local/lib/python3.10/dist-packages/torch/_dynamo/eval_frame.py", line 328, in _fn
+    return fn(*args, **kwargs)
+  File "/DeepSpeed/deepspeed/comm/torch.py", line 335, in barrier
+    return torch.distributed.barrier(group=group, async_op=async_op, device_ids=device_ids)
+  File "/usr/local/lib/python3.10/dist-packages/torch/distributed/c10d_logger.py", line 47, in wrapper
+    return func(*args, **kwargs)
+  File "/usr/local/lib/python3.10/dist-packages/torch/distributed/distributed_c10d.py", line 3698, in barrier
+    work = group.barrier(opts=opts)
+RuntimeError: oneCCL: atl_mpi_comm.cpp:87 init_transport: EXCEPTION: failed to initialize ATL
+[31m[1m___________ TestMoECheckpoint.test_checkpoint_moe_and_zero[2-False] ____________[0m
+Worker 0 exited with code 1
+----------------------------- Captured stdout call -----------------------------
+[2024-04-10 06:09:22,838] [INFO] [real_accelerator.py:203:get_accelerator] Setting ds_accelerator to xpu (auto detect)
+[2024-04-10 06:09:22,842] [INFO] [real_accelerator.py:203:get_accelerator] Setting ds_accelerator to xpu (auto detect)
+[2024-04-10 06:09:22,856] [INFO] [real_accelerator.py:203:get_accelerator] Setting ds_accelerator to xpu (auto detect)
+[2024-04-10 06:09:22,857] [INFO] [real_accelerator.py:203:get_accelerator] Setting ds_accelerator to xpu (auto detect)
+[2024-04-10 06:09:22,859] [INFO] [real_accelerator.py:203:get_accelerator] Setting ds_accelerator to xpu (auto detect)
+[2024-04-10 06:09:22,863] [INFO] [real_accelerator.py:203:get_accelerator] Setting ds_accelerator to xpu (auto detect)
+[2024-04-10 06:09:22,875] [INFO] [real_accelerator.py:203:get_accelerator] Setting ds_accelerator to xpu (auto detect)
+[2024-04-10 06:09:22,881] [INFO] [real_accelerator.py:203:get_accelerator] Setting ds_accelerator to xpu (auto detect)
+[93m [WARNING] [0m async_io requires the dev libaio .so object and headers but these were not found.
+[93m [WARNING] [0m async_io: please install the libaio-dev package with apt
+[93m [WARNING] [0m If libaio is already installed (perhaps from source), try setting the CFLAGS and LDFLAGS environment variables to where it can be found.
+[2024-04-10 06:09:23,729] [INFO] [comm.py:161:init_deepspeed_backend] Initialize ccl backend
+[2024-04-10 06:09:23,729] [INFO] [comm.py:637:init_distributed] cdb=None
+[93m [WARNING] [0m async_io requires the dev libaio .so object and headers but these were not found.
+[93m [WARNING] [0m async_io: please install the libaio-dev package with apt
+[93m [WARNING] [0m If libaio is already installed (perhaps from source), try setting the CFLAGS and LDFLAGS environment variables to where it can be found.
+[2024-04-10 06:09:23,756] [INFO] [comm.py:161:init_deepspeed_backend] Initialize ccl backend
+[2024-04-10 06:09:23,756] [INFO] [comm.py:637:init_distributed] cdb=None
+[93m [WARNING] [0m async_io requires the dev libaio .so object and headers but these were not found.
+[93m [WARNING] [0m async_io: please install the libaio-dev package with apt
+[93m [WARNING] [0m If libaio is already installed (perhaps from source), try setting the CFLAGS and LDFLAGS environment variables to where it can be found.
+[2024-04-10 06:09:23,797] [INFO] [comm.py:161:init_deepspeed_backend] Initialize ccl backend
+[2024-04-10 06:09:23,798] [INFO] [comm.py:637:init_distributed] cdb=None
+[2024-04-10 06:09:23,798] [INFO] [comm.py:668:init_distributed] Initializing TorchBackend in DeepSpeed with backend ccl
+[93m [WARNING] [0m async_io requires the dev libaio .so object and headers but these were not found.
+[93m [WARNING] [0m async_io: please install the libaio-dev package with apt
+[93m [WARNING] [0m If libaio is already installed (perhaps from source), try setting the CFLAGS and LDFLAGS environment variables to where it can be found.
+[2024-04-10 06:09:23,813] [INFO] [comm.py:161:init_deepspeed_backend] Initialize ccl backend
+[2024-04-10 06:09:23,814] [INFO] [comm.py:637:init_distributed] cdb=None
+2024:04:10-06:09:23:(38825) |CCL_WARN| did not find MPI-launcher specific variables, switch to ATL/OFI, to force enable ATL/MPI set CCL_ATL_TRANSPORT=mpi
+2024:04:10-06:09:23:(38825) |CCL_WARN| could not get local_idx/count from environment variables, trying to get them from ATL
+2024:04:10-06:09:23:(38825) |CCL_WARN| fallback to 'sockets' mode of ze exchange mechanism, to use CCL_ZE_IPC_EXHANGE=drmfd, set CCL_LOCAL_RANK/SIZE explicitly  or use process launcher
+2024:04:10-06:09:23:(38825) |CCL_WARN| could not open the library: libfabric.so, error: libfabric.so: cannot open shared object file: No such file or directory
+2024:04:10-06:09:23:(38825) |CCL_WARN| OFI transport was not initialized, fallback to MPI transport
+2024:04:10-06:09:24:(38827) |CCL_WARN| did not find MPI-launcher specific variables, switch to ATL/OFI, to force enable ATL/MPI set CCL_ATL_TRANSPORT=mpi
+2024:04:10-06:09:24:(38827) |CCL_WARN| could not get local_idx/count from environment variables, trying to get them from ATL
+2024:04:10-06:09:24:(38827) |CCL_WARN| fallback to 'sockets' mode of ze exchange mechanism, to use CCL_ZE_IPC_EXHANGE=drmfd, set CCL_LOCAL_RANK/SIZE explicitly  or use process launcher
+2024:04:10-06:09:24:(38827) |CCL_WARN| could not open the library: libfabric.so, error: libfabric.so: cannot open shared object file: No such file or directory
+2024:04:10-06:09:24:(38827) |CCL_WARN| OFI transport was not initialized, fallback to MPI transport
+2024:04:10-06:09:24:(38826) |CCL_WARN| did not find MPI-launcher specific variables, switch to ATL/OFI, to force enable ATL/MPI set CCL_ATL_TRANSPORT=mpi
+2024:04:10-06:09:24:(38824) |CCL_WARN| did not find MPI-launcher specific variables, switch to ATL/OFI, to force enable ATL/MPI set CCL_ATL_TRANSPORT=mpi
+2024:04:10-06:09:24:(38826) |CCL_WARN| could not get local_idx/count from environment variables, trying to get them from ATL
+2024:04:10-06:09:24:(38826) |CCL_WARN| fallback to 'sockets' mode of ze exchange mechanism, to use CCL_ZE_IPC_EXHANGE=drmfd, set CCL_LOCAL_RANK/SIZE explicitly  or use process launcher
+2024:04:10-06:09:24:(38824) |CCL_WARN| could not get local_idx/count from environment variables, trying to get them from ATL
+2024:04:10-06:09:24:(38824) |CCL_WARN| fallback to 'sockets' mode of ze exchange mechanism, to use CCL_ZE_IPC_EXHANGE=drmfd, set CCL_LOCAL_RANK/SIZE explicitly  or use process launcher
+2024:04:10-06:09:24:(38826) |CCL_WARN| could not open the library: libfabric.so, error: libfabric.so: cannot open shared object file: No such file or directory
+2024:04:10-06:09:24:(38824) |CCL_WARN| could not open the library: libfabric.so, error: libfabric.so: cannot open shared object file: No such file or directory
+2024:04:10-06:09:24:(38826) |CCL_WARN| OFI transport was not initialized, fallback to MPI transport
+2024:04:10-06:09:24:(38824) |CCL_WARN| OFI transport was not initialized, fallback to MPI transport
+----------------------------- Captured stderr call -----------------------------
+/usr/local/lib/python3.10/dist-packages/torchvision/io/image.py:13: UserWarning: Failed to load image Python extension: 'libpng16.so.16: cannot open shared object file: No such file or directory'If you don't plan on using image functionality from `torchvision.io`, you can ignore this warning. Otherwise, there might be something wrong with your environment. Did you have `libjpeg` or `libpng` installed before building `torchvision` from source?
+  warn(
+/usr/local/lib/python3.10/dist-packages/torchvision/io/image.py:13: UserWarning: Failed to load image Python extension: 'libpng16.so.16: cannot open shared object file: No such file or directory'If you don't plan on using image functionality from `torchvision.io`, you can ignore this warning. Otherwise, there might be something wrong with your environment. Did you have `libjpeg` or `libpng` installed before building `torchvision` from source?
+  warn(
+/usr/local/lib/python3.10/dist-packages/torchvision/io/image.py:13: UserWarning: Failed to load image Python extension: 'libpng16.so.16: cannot open shared object file: No such file or directory'If you don't plan on using image functionality from `torchvision.io`, you can ignore this warning. Otherwise, there might be something wrong with your environment. Did you have `libjpeg` or `libpng` installed before building `torchvision` from source?
+  warn(
+/usr/local/lib/python3.10/dist-packages/torchvision/io/image.py:13: UserWarning: Failed to load image Python extension: 'libpng16.so.16: cannot open shared object file: No such file or directory'If you don't plan on using image functionality from `torchvision.io`, you can ignore this warning. Otherwise, there might be something wrong with your environment. Did you have `libjpeg` or `libpng` installed before building `torchvision` from source?
+  warn(
+2024:04:10-06:09:23:(38825) |CCL_ERROR| atl_mpi_ctx.cpp:605 check_impi_env: CCL/MPI uses Intel(R) MPI Library but neither I_MPI_ROOT nor ONEAPI_ROOT is set. Please source release version of Intel(R) MPI Library (2019 or higher version).
+2024:04:10-06:09:23:(38825) |CCL_ERROR| atl_mpi_ctx.cpp:605 check_impi_env: CCL/MPI uses Intel(R) MPI Library but neither I_MPI_ROOT nor ONEAPI_ROOT is set. Please source release version of Intel(R) MPI Library (2019 or higher version).
+2024:04:10-06:09:24:(38827) |CCL_ERROR| atl_mpi_ctx.cpp:605 check_impi_env: CCL/MPI uses Intel(R) MPI Library but neither I_MPI_ROOT nor ONEAPI_ROOT is set. Please source release version of Intel(R) MPI Library (2019 or higher version).
+2024:04:10-06:09:24:(38827) |CCL_ERROR| atl_mpi_ctx.cpp:605 check_impi_env: CCL/MPI uses Intel(R) MPI Library but neither I_MPI_ROOT nor ONEAPI_ROOT is set. Please source release version of Intel(R) MPI Library (2019 or higher version).
+2024:04:10-06:09:24:(38824) |CCL_ERROR| atl_mpi_ctx.cpp:605 check_impi_env: CCL/MPI uses Intel(R) MPI Library but neither I_MPI_ROOT nor ONEAPI_ROOT is set. Please source release version of Intel(R) MPI Library (2019 or higher version).2024:04:10-06:09:24:(38826) |CCL_ERROR| atl_mpi_ctx.cpp:605 check_impi_env: CCL/MPI uses Intel(R) MPI Library but neither I_MPI_ROOT nor ONEAPI_ROOT is set. Please source release version of Intel(R) MPI Library (2019 or higher version).
+
+2024:04:10-06:09:24:(38826) |CCL_ERROR| atl_mpi_ctx.cpp:605 check_impi_env: CCL/MPI uses Intel(R) MPI Library but neither I_MPI_ROOT nor ONEAPI_ROOT is set. Please source release version of Intel(R) MPI Library (2019 or higher version).
+2024:04:10-06:09:24:(38824) |CCL_ERROR| atl_mpi_ctx.cpp:605 check_impi_env: CCL/MPI uses Intel(R) MPI Library but neither I_MPI_ROOT nor ONEAPI_ROOT is set. Please source release version of Intel(R) MPI Library (2019 or higher version).
+2024:04:10-06:09:25:(38824) |CCL_ERROR| atl_mpi_ctx.cpp:605 check_impi_env: CCL/MPI uses Intel(R) MPI Library but neither I_MPI_ROOT nor ONEAPI_ROOT is set. Please source release version of Intel(R) MPI Library (2019 or higher version).2024:04:10-06:09:25:(38826) |CCL_ERROR| atl_mpi_ctx.cpp:605 check_impi_env: CCL/MPI uses Intel(R) MPI Library but neither I_MPI_ROOT nor ONEAPI_ROOT is set. Please source release version of Intel(R) MPI Library (2019 or higher version).2024:04:10-06:09:25:(38825) |CCL_ERROR| atl_mpi_ctx.cpp:605 check_impi_env: CCL/MPI uses Intel(R) MPI Library but neither I_MPI_ROOT nor ONEAPI_ROOT is set. Please source release version of Intel(R) MPI Library (2019 or higher version).2024:04:10-06:09:25:(38827) |CCL_ERROR| atl_mpi_ctx.cpp:605 check_impi_env: CCL/MPI uses Intel(R) MPI Library but neither I_MPI_ROOT nor ONEAPI_ROOT is set. Please source release version of Intel(R) MPI Library (2019 or higher version).
+
+
+
+2024:04:10-06:09:25:(38824) |CCL_ERROR| atl_mpi_comm.cpp:87 init_transport: condition transport->init(nullptr, nullptr, &attr, nullptr, pmi) == ATL_STATUS_SUCCESS failed
+failed to initialize ATL2024:04:10-06:09:25:(38826) |CCL_ERROR| atl_mpi_comm.cpp:87 init_transport: condition transport->init(nullptr, nullptr, &attr, nullptr, pmi) == ATL_STATUS_SUCCESS failed
+failed to initialize ATL2024:04:10-06:09:25:(38825) |CCL_ERROR| atl_mpi_comm.cpp:87 init_transport: condition transport->init(nullptr, nullptr, &attr, nullptr, pmi) == ATL_STATUS_SUCCESS failed
+failed to initialize ATL
+2024:04:10-06:09:25:(38827) |CCL_ERROR| atl_mpi_comm.cpp:87 init_transport: condition transport->init(nullptr, nullptr, &attr, nullptr, pmi) == ATL_STATUS_SUCCESS failed
+failed to initialize ATL
+
+
+Process Process-84:
+Process Process-82:
+Process Process-83:
+Process Process-81:
+Traceback (most recent call last):
+Traceback (most recent call last):
+Traceback (most recent call last):
+Traceback (most recent call last):
+  File "/usr/lib/python3.10/multiprocessing/process.py", line 314, in _bootstrap
+    self.run()
+  File "/usr/lib/python3.10/multiprocessing/process.py", line 108, in run
+    self._target(*self._args, **self._kwargs)
+  File "/usr/lib/python3.10/multiprocessing/process.py", line 314, in _bootstrap
+    self.run()
+  File "/usr/lib/python3.10/multiprocessing/process.py", line 314, in _bootstrap
+    self.run()
+  File "/DeepSpeed/tests/unit/common.py", line 284, in _dist_run
+    dist.barrier()
+  File "/usr/lib/python3.10/multiprocessing/process.py", line 314, in _bootstrap
+    self.run()
+  File "/usr/lib/python3.10/multiprocessing/process.py", line 108, in run
+    self._target(*self._args, **self._kwargs)
+  File "/usr/lib/python3.10/multiprocessing/process.py", line 108, in run
+    self._target(*self._args, **self._kwargs)
+  File "/DeepSpeed/deepspeed/comm/comm.py", line 117, in log_wrapper
+    return func(*args, **kwargs)
+  File "/usr/lib/python3.10/multiprocessing/process.py", line 108, in run
+    self._target(*self._args, **self._kwargs)
+  File "/DeepSpeed/tests/unit/common.py", line 284, in _dist_run
+    dist.barrier()
+  File "/DeepSpeed/tests/unit/common.py", line 284, in _dist_run
+    dist.barrier()
+  File "/DeepSpeed/deepspeed/comm/comm.py", line 408, in barrier
+    return cdb.barrier(group=group, async_op=async_op)
+  File "/DeepSpeed/tests/unit/common.py", line 284, in _dist_run
+    dist.barrier()
+  File "/DeepSpeed/deepspeed/comm/comm.py", line 117, in log_wrapper
+    return func(*args, **kwargs)
+  File "/DeepSpeed/deepspeed/comm/comm.py", line 117, in log_wrapper
+    return func(*args, **kwargs)
+  File "/usr/local/lib/python3.10/dist-packages/torch/_dynamo/eval_frame.py", line 328, in _fn
+    return fn(*args, **kwargs)
+  File "/DeepSpeed/deepspeed/comm/comm.py", line 117, in log_wrapper
+    return func(*args, **kwargs)
+  File "/DeepSpeed/deepspeed/comm/comm.py", line 408, in barrier
+    return cdb.barrier(group=group, async_op=async_op)
+  File "/DeepSpeed/deepspeed/comm/comm.py", line 408, in barrier
+    return cdb.barrier(group=group, async_op=async_op)
+  File "/DeepSpeed/deepspeed/comm/torch.py", line 335, in barrier
+    return torch.distributed.barrier(group=group, async_op=async_op, device_ids=device_ids)
+  File "/DeepSpeed/deepspeed/comm/comm.py", line 408, in barrier
+    return cdb.barrier(group=group, async_op=async_op)
+  File "/usr/local/lib/python3.10/dist-packages/torch/_dynamo/eval_frame.py", line 328, in _fn
+    return fn(*args, **kwargs)
+  File "/usr/local/lib/python3.10/dist-packages/torch/_dynamo/eval_frame.py", line 328, in _fn
+    return fn(*args, **kwargs)
+  File "/usr/local/lib/python3.10/dist-packages/torch/distributed/c10d_logger.py", line 47, in wrapper
+    return func(*args, **kwargs)
+  File "/usr/local/lib/python3.10/dist-packages/torch/_dynamo/eval_frame.py", line 328, in _fn
+    return fn(*args, **kwargs)
+  File "/DeepSpeed/deepspeed/comm/torch.py", line 335, in barrier
+    return torch.distributed.barrier(group=group, async_op=async_op, device_ids=device_ids)
+  File "/DeepSpeed/deepspeed/comm/torch.py", line 335, in barrier
+    return torch.distributed.barrier(group=group, async_op=async_op, device_ids=device_ids)
+  File "/usr/local/lib/python3.10/dist-packages/torch/distributed/distributed_c10d.py", line 3698, in barrier
+    work = group.barrier(opts=opts)
+  File "/DeepSpeed/deepspeed/comm/torch.py", line 335, in barrier
+    return torch.distributed.barrier(group=group, async_op=async_op, device_ids=device_ids)
+  File "/usr/local/lib/python3.10/dist-packages/torch/distributed/c10d_logger.py", line 47, in wrapper
+    return func(*args, **kwargs)
+  File "/usr/local/lib/python3.10/dist-packages/torch/distributed/c10d_logger.py", line 47, in wrapper
+    return func(*args, **kwargs)
+  File "/usr/local/lib/python3.10/dist-packages/torch/distributed/c10d_logger.py", line 47, in wrapper
+    return func(*args, **kwargs)
+  File "/usr/local/lib/python3.10/dist-packages/torch/distributed/distributed_c10d.py", line 3698, in barrier
+    work = group.barrier(opts=opts)
+  File "/usr/local/lib/python3.10/dist-packages/torch/distributed/distributed_c10d.py", line 3698, in barrier
+    work = group.barrier(opts=opts)
+  File "/usr/local/lib/python3.10/dist-packages/torch/distributed/distributed_c10d.py", line 3698, in barrier
+    work = group.barrier(opts=opts)
+RuntimeError: oneCCL: atl_mpi_comm.cpp:87 init_transport: EXCEPTION: failed to initialize ATL
+RuntimeError: oneCCL: atl_mpi_comm.cpp:87 init_transport: EXCEPTION: failed to initialize ATL
+RuntimeError: oneCCL: atl_mpi_comm.cpp:87 init_transport: EXCEPTION: failed to initialize ATL
+RuntimeError: oneCCL: atl_mpi_comm.cpp:87 init_transport: EXCEPTION: failed to initialize ATL
+[33m=============================== warnings summary ===============================[0m
+../../../usr/local/lib/python3.10/dist-packages/torchvision/io/image.py:13
+  /usr/local/lib/python3.10/dist-packages/torchvision/io/image.py:13: UserWarning: Failed to load image Python extension: 'libpng16.so.16: cannot open shared object file: No such file or directory'If you don't plan on using image functionality from `torchvision.io`, you can ignore this warning. Otherwise, there might be something wrong with your environment. Did you have `libjpeg` or `libpng` installed before building `torchvision` from source?
+    warn(
+
+../../../usr/local/lib/python3.10/dist-packages/torch/utils/cpp_extension.py:28
+  /usr/local/lib/python3.10/dist-packages/torch/utils/cpp_extension.py:28: DeprecationWarning: pkg_resources is deprecated as an API. See https://setuptools.pypa.io/en/latest/pkg_resources.html
+    from pkg_resources import packaging  # type: ignore[attr-defined]
+
+<string>:8
+  <string>:8: PytestDeprecationWarning: A private pytest class or function was used.
+
+unit/checkpoint/test_moe_checkpoint.py::TestMoECheckpoint::test_checkpoint_moe[4]
+  /DeepSpeed/tests/conftest.py:47: UserWarning: Running test without verifying torch version, please provide an expected torch version with --torch_ver
+    warnings.warn(
+
+unit/checkpoint/test_moe_checkpoint.py::TestMoECheckpoint::test_checkpoint_moe[4]
+  /DeepSpeed/tests/conftest.py:54: UserWarning: Running test without verifying cuda version, please provide an expected cuda version with --cuda_ver
+    warnings.warn(
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+============================== slowest durations ===============================
+5.61s call     unit/checkpoint/test_moe_checkpoint.py::TestMoECheckpoint::test_checkpoint_moe_and_zero[4-True]
+5.41s call     unit/checkpoint/test_moe_checkpoint.py::TestMoECheckpoint::test_checkpoint_moe_and_zero[4-False]
+5.41s call     unit/checkpoint/test_moe_checkpoint.py::TestMoECheckpoint::test_checkpoint_moe_and_zero[2-False]
+4.54s call     unit/checkpoint/test_moe_checkpoint.py::TestMoECheckpoint::test_checkpoint_moe[4]
+4.51s call     unit/checkpoint/test_moe_checkpoint.py::TestMoECheckpoint::test_checkpoint_moe_and_zero[2-True]
+
+(10 durations < 1s hidden.  Use -vv to show these durations.)
+[36m[1m=========================== short test summary info ============================[0m
+[31mFAILED[0m checkpoint/test_moe_checkpoint.py::[1mTestMoECheckpoint::test_checkpoint_moe[4][0m - Failed: Worker 0 exited with code 1
+[31mFAILED[0m checkpoint/test_moe_checkpoint.py::[1mTestMoECheckpoint::test_checkpoint_moe_and_zero[4-True][0m - Failed: Worker 0 exited with code 1
+[31mFAILED[0m checkpoint/test_moe_checkpoint.py::[1mTestMoECheckpoint::test_checkpoint_moe_and_zero[4-False][0m - Failed: Worker 0 exited with code 1
+[31mFAILED[0m checkpoint/test_moe_checkpoint.py::[1mTestMoECheckpoint::test_checkpoint_moe_and_zero[2-True][0m - Failed: Worker 0 exited with code 1
+[31mFAILED[0m checkpoint/test_moe_checkpoint.py::[1mTestMoECheckpoint::test_checkpoint_moe_and_zero[2-False][0m - Failed: Worker 0 exited with code 1
+[31m======================== [31m[1m5 failed[0m, [33m5 warnings[0m[31m in 27.53s[0m[31m ========================[0m
