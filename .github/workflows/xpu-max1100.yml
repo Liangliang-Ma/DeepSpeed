@@ -67,5 +67,5 @@ jobs:
         export LD_LIBRARY_PATH=$ONEAPI_ROOT/opt/mpi/libfabric/lib:$LD_LIBRARY_PATH
         export LD_LIBRARY_PATH=$ONEAPI_ROOT/lib:$LD_LIBRARY_PATH
         cd tests/unit
-        pytest --setup-timeout 50 --execution-timeout 50 --teardown-timeout 10 .
+        pytest . --timeout=50
         
