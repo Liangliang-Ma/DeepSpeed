@@ -56,7 +56,6 @@ jobs:
         which python
     
     - name: Check container state
-      shell: bash
       run: |
         which python
         conda activate ds_xpu_ci
