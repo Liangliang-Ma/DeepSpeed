@@ -56,6 +56,7 @@ jobs:
         pip install py-cpuinfo pytest pytest-timeout tabulate tensorboard wandb transformers accelerate
     
     - name: Check container state
+      shell: bash
       run: |
         source ./miniconda3/bin/activate
         conda activate ds_xpu_ci
