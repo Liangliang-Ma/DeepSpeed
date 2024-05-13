@@ -47,8 +47,7 @@ jobs:
         apt-get install clinfo
         curl -fsSL -v -o miniconda.sh -O https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh
         bash miniconda.sh -b -p ./miniconda3
-        echo "source ~/miniconda3/bin/activate" >> ./.bashrc
-        . /miniconda3/bin/activate
+        . ./miniconda3/bin/activate
         conda create -n ds_xpu_ci python=3.10.13 -y && conda activate ds_xpu_ci
         pip install torch==2.1.0.post0 -f https://developer.intel.com/ipex-whl-stable-xpu
         pip install intel-extension-for-pytorch==2.1.20+xpu -f https://developer.intel.com/ipex-whl-stable-xpu
