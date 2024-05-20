@@ -61,7 +61,7 @@ def _get_test_write_file_and_cuda_buffer(tmpdir, ref_buffer, index=0):
 def _get_test_write_file_and_cpu_buffer(tmpdir, ref_buffer, aio_handle=None, index=0):
     test_file = _get_test_write_file(tmpdir, index)
     if aio_handle is None:
-        test_buffer = get_accelerator().pin_memory(torch.ByteTensor(list(ref_buffer)))
+        test_buffer = get_accelerator().pin_memory(torch.ByteTensor(list(ref_buffer)), align_bytes=0)
     else:
         tmp_buffer = torch.ByteTensor(list(ref_buffer))
         test_buffer = aio_handle.new_cpu_locked_tensor(len(ref_buffer), tmp_buffer)
@@ -92,10 +92,13 @@ class TestRead(DistributedTest):
     def test_parallel_read(self, tmpdir, use_cuda_pinned_tensor, single_submit, overlap_events):
         _skip_for_invalid_environment(use_cuda_device=False, use_cuda_pinned_tensor=use_cuda_pinned_tensor)
 
+        # import ipdb
+        # ipdb.set_trace()
+
         h = AsyncIOBuilder().load().aio_handle(BLOCK_SIZE, QUEUE_DEPTH, single_submit, overlap_events, IO_PARALLEL)
 
         if use_cuda_pinned_tensor:
-            aio_buffer = get_accelerator().pin_memory(torch.empty(IO_SIZE, dtype=torch.uint8, device='cpu'))
+            aio_buffer = get_accelerator().pin_memory(torch.empty(IO_SIZE, dtype=torch.uint8, device='cpu'), align_bytes=0)
         else:
             aio_buffer = h.new_cpu_locked_tensor(IO_SIZE, torch.empty(0, dtype=torch.uint8))
 
@@ -107,6 +110,11 @@ class TestRead(DistributedTest):
 
         with open(ref_file, 'rb') as f:
             ref_buffer = list(f.read())
+
+        print(h)
+        print(aio_buffer)
+        print(ref_buffer)
+
         assert ref_buffer == aio_buffer.tolist()
 
         if not use_cuda_pinned_tensor:
@@ -120,9 +128,10 @@ class TestRead(DistributedTest):
         h = AsyncIOBuilder().load().aio_handle(BLOCK_SIZE, QUEUE_DEPTH, single_submit, overlap_events, IO_PARALLEL)
 
         if cuda_device:
-            aio_buffer = torch.empty(IO_SIZE, dtype=torch.uint8, device=get_accelerator().device_name())
+            # aio_buffer = torch.empty(IO_SIZE, dtype=torch.uint8, device=get_accelerator().device_name())
+            aio_buffer = get_accelerator().pin_memory(torch.empty(IO_SIZE, dtype=torch.uint8, device='cpu'), align_bytes=0)
         elif use_cuda_pinned_tensor:
-            aio_buffer = get_accelerator().pin_memory(torch.empty(IO_SIZE, dtype=torch.uint8, device='cpu'))
+            aio_buffer = get_accelerator().pin_memory(torch.empty(IO_SIZE, dtype=torch.uint8, device='cpu'), align_bytes=0)
         else:
             aio_buffer = h.new_cpu_locked_tensor(IO_SIZE, torch.empty(0, dtype=torch.uint8))
             use_cpu_locked_tensor = True
@@ -188,7 +197,8 @@ class TestWrite(DistributedTest):
         h = AsyncIOBuilder().load().aio_handle(BLOCK_SIZE, QUEUE_DEPTH, single_submit, overlap_events, IO_PARALLEL)
         use_cpu_locked_tensor = False
         if cuda_device:
-            aio_file, aio_buffer = _get_test_write_file_and_cuda_buffer(tmpdir, ref_buffer)
+            # aio_file, aio_buffer = _get_test_write_file_and_cuda_buffer(tmpdir, ref_buffer)
+            aio_file, aio_buffer = _get_test_write_file_and_cpu_buffer(tmpdir, ref_buffer)
         elif use_cuda_pinned_tensor:
             aio_file, aio_buffer = _get_test_write_file_and_cpu_buffer(tmpdir, ref_buffer)
         else:
@@ -237,13 +247,17 @@ class TestAsyncQueue(DistributedTest):
 
         use_cpu_locked_tensor = False
         if cuda_device:
+            # aio_buffers = [
+            #     torch.empty(IO_SIZE, dtype=torch.uint8, device=get_accelerator().device_name())
+            #     for _ in range(async_queue)
+            # ]
             aio_buffers = [
-                torch.empty(IO_SIZE, dtype=torch.uint8, device=get_accelerator().device_name())
+                get_accelerator().pin_memory(torch.empty(IO_SIZE, dtype=torch.uint8, device='cpu'), align_bytes=0)
                 for _ in range(async_queue)
             ]
         elif use_cuda_pinned_tensor:
             aio_buffers = [
-                get_accelerator().pin_memory(torch.empty(IO_SIZE, dtype=torch.uint8, device='cpu'))
+                get_accelerator().pin_memory(torch.empty(IO_SIZE, dtype=torch.uint8, device='cpu'), align_bytes=0)
                 for _ in range(async_queue)
             ]
         else:
@@ -316,3 +330,59 @@ class TestAsyncQueue(DistributedTest):
 
             filecmp.clear_cache()
             assert filecmp.cmp(ref_files[i], aio_files[i], shallow=False)
+
+
+# if __name__ == '__main__':
+#     local_rank = int(os.getenv("LOCAL_RANK", "0"))
+#     world_size = int(os.getenv("WORLD_SIZE", "1"))
+#     get_accelerator().set_device(local_rank)
+#     deepspeed.init_distributed()
+
+#     use_cuda_pinned_tensor = True
+#     single_submit = True
+#     overlap_events = True
+
+#     world_size = 1
+#     reuse_dist_env = True
+#     requires_cuda_env = False
+#     if not get_accelerator().is_available():
+#         init_distributed = False
+#         set_dist_env = False
+#     tmpdir = "."
+
+#     def test_parallel_read(use_cuda_pinned_tensor, single_submit, overlap_events):
+#         _skip_for_invalid_environment(use_cuda_device=False, use_cuda_pinned_tensor=use_cuda_pinned_tensor)
+
+#         # import ipdb
+#         # ipdb.set_trace()
+
+#         h = AsyncIOBuilder().load().aio_handle(BLOCK_SIZE, QUEUE_DEPTH, single_submit, overlap_events, IO_PARALLEL)
+
+#         if use_cuda_pinned_tensor:
+#             aio_buffer = get_accelerator().pin_memory(torch.empty(IO_SIZE, dtype=torch.uint8, device='cpu'), align_bytes=0)
+#         else:
+#             aio_buffer = h.new_cpu_locked_tensor(IO_SIZE, torch.empty(0, dtype=torch.uint8))
+
+#         _validate_handle_state(h, single_submit, overlap_events)
+
+#         ref_file, ref_ref_buffer = _do_ref_write(tmpdir)
+#         ref_ref_buffer = [x for x in ref_ref_buffer]
+#         print("base:", ref_ref_buffer[:10])
+#         print("aio:", aio_buffer.tolist()[:10])
+
+#         read_status = h.sync_pread(aio_buffer, ref_file)
+#         assert read_status == 1
+
+#         print("aio:", aio_buffer.tolist()[:10])
+
+#         with open(ref_file, 'rb') as f:
+#             ref_buffer = list(f.read())
+
+#         ref_ref_buffer = [x for x in ref_ref_buffer]
+#         assert ref_ref_buffer == ref_buffer
+#         assert ref_buffer == aio_buffer.tolist()
+
+#         if not use_cuda_pinned_tensor:
+#             h.free_cpu_locked_tensor(aio_buffer)
+    
+#     test_parallel_read(use_cuda_pinned_tensor, single_submit, overlap_events)
