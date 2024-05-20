@@ -60,7 +60,7 @@ class XPU_Accelerator(DeepSpeedAccelerator):
 
     # RNG APIs
     def random(self):
-        return torch.xpu.random
+        return torch.random
 
     def set_rng_state(self, new_state, device_index=None):
         if device_index == None:
