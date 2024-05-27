@@ -42,6 +42,7 @@ jobs:
     steps:
     - uses: actions/checkout@v4
     - name: Install prerequisite
+      shell: bash
       run: |
         apt-get update
         apt-get install clinfo libaio-dev -y
