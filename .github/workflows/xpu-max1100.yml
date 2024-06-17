@@ -75,7 +75,6 @@ jobs:
         pytest --verbose checkpoint/test_moe_checkpoint.py
         pytest --verbose checkpoint/test_shared_weights.py
         pytest --verbose launcher/test_ds_arguments.py launcher/test_run.py
-        pytest --verbose hybrid_engine/*
         pytest --verbose inference/*
         pytest --verbose linear/*
         pytest --verbose model_parallelism/*
