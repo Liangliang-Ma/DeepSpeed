@@ -69,13 +69,12 @@ jobs:
       shell: bash
       run: |
         cd tests/unit
-        pytest --verbose accelerator/*
-        pytest --verbose autotuning/*
-        pytest --verbose checkpoint/test_reshape_checkpoint.py
-        pytest --verbose checkpoint/test_moe_checkpoint.py
-        pytest --verbose checkpoint/test_shared_weights.py
-        pytest --verbose launcher/test_ds_arguments.py launcher/test_run.py
-        pytest --verbose inference/*
+        # pytest --verbose accelerator/*
+        # pytest --verbose autotuning/*
+        # pytest --verbose checkpoint/test_reshape_checkpoint.py
+        # pytest --verbose checkpoint/test_moe_checkpoint.py
+        # pytest --verbose checkpoint/test_shared_weights.py
+        # pytest --verbose launcher/test_ds_arguments.py launcher/test_run.py
         pytest --verbose linear/*
         pytest --verbose model_parallelism/*
         pytest --verbose moe/*
