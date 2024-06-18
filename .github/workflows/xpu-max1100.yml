@@ -42,7 +42,6 @@ jobs:
     steps:
     - uses: actions/checkout@v4
     - name: Install prerequisite
-      shell: bash
       run: |
         apt-get update
         apt-get install clinfo libaio-dev python3-pip -y
@@ -55,7 +54,6 @@ jobs:
         pip install .[dev,autotuning]
 
     - name: Check container state
-      shell: bash
       run: |
         ldd --version
         ds_report
