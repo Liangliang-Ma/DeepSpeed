@@ -74,7 +74,8 @@ jobs:
         pytest --verbose checkpoint/test_shared_weights.py
         pytest --verbose launcher/test_ds_arguments.py launcher/test_run.py
         pytest --verbose model_parallelism/*
-        pytest --verbose moe/*
+        pytest --verbose moe/test_moe.py
+        pytest --verbose moe/test_moe_tp.py
         pytest --verbose monitor/*
         pytest --verbose pipe/*
         pytest --verbose profiling/flops_profiler/*
