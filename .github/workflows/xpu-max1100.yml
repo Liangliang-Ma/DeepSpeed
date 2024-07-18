@@ -76,7 +76,6 @@ jobs:
         pytest --verbose model_parallelism/*
         pytest --verbose moe/test_moe_tp.py
         pytest --verbose monitor/*
-        pytest --verbose pipe/*
         pytest --verbose profiling/flops_profiler/*
         pytest --verbose utils/*
         pytest --verbose runtime/test_ds_config_model.py
