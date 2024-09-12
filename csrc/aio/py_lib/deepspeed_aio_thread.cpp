@@ -39,19 +39,19 @@ void deepspeed_aio_thread_t::run()
         }
 
         if (next_io_op) {
-            const auto base_offset = next_io_op->_num_bytes * _tid;
+            // const auto base_offset = next_io_op->_num_bytes * _tid;
 
-            std::unique_ptr<io_xfer_ctxt> xfer_ctxt(new io_xfer_ctxt(
-                next_io_op->_fd, base_offset, next_io_op->_num_bytes, next_io_op->data_ptr()));
+            // std::unique_ptr<io_xfer_ctxt> xfer_ctxt(new io_xfer_ctxt(
+            //     next_io_op->_fd, base_offset, next_io_op->_num_bytes, next_io_op->data_ptr()));
 
-            if (_aio_config._overlap_events) {
-                do_aio_operation_overlap(
-                    next_io_op->_read_op, _aio_ctxt, xfer_ctxt, &_aio_config, nullptr);
-            } else {
-                do_aio_operation_sequential(
-                    next_io_op->_read_op, _aio_ctxt, xfer_ctxt, &_aio_config, nullptr);
-            }
-            // next_io_op->run(_tid, _aio_ctxt, &_aio_config);
+            // if (_aio_config._overlap_events) {
+            //     do_aio_operation_overlap(
+            //         next_io_op->_read_op, _aio_ctxt, xfer_ctxt, &_aio_config, nullptr);
+            // } else {
+            //     do_aio_operation_sequential(
+            //         next_io_op->_read_op, _aio_ctxt, xfer_ctxt, &_aio_config, nullptr);
+            // }
+            next_io_op->run(_tid, _aio_ctxt, &_aio_config);
 
             {
                 std::lock_guard<std::mutex> lock(_complete_sync._mutex);

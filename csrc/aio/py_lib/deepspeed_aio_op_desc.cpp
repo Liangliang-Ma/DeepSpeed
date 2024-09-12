@@ -11,35 +11,28 @@ io_op_desc_t::io_op_desc_t(const bool read_op,
                            const torch::Tensor& buffer,
                            const int fd,
                            const char* filename,
-                           const long long int num_bytes,
+                           const long long int file_num_bytes,
+                           const int num_threads,
                            const bool validate)
     : _read_op(read_op),
       _buffer(buffer),
       _fd(fd),
       _filename(filename),
-      _num_bytes(num_bytes),
+      _file_num_bytes(file_num_bytes),
+      _num_threads(num_threads),
+      _num_bytes_per_thread(file_num_bytes / num_threads),
       _validate(validate)
 {
-    _cpu_buffer = (_buffer.is_cuda() || _buffer.is_xpu()
-#if defined(__ENABLE_CANN__)
-                   || torch_npu::utils::is_npu(_buffer)
-#endif
-                       )
-                      ? _buffer.to(torch::kCPU).pin_memory()
-                      : _buffer;
-    _contiguous_buffer = _cpu_buffer.contiguous();
 }
 
 char* io_op_desc_t::data_ptr() const { return (char*)_contiguous_buffer.data_ptr(); }
 
-void io_op_desc_t::fini()
+void io_op_desc_t::finish() {}
+
+void io_op_desc_t::validate() {}
+
+void io_op_desc_t::run(const int tid,
+                       std::unique_ptr<aio_context>& aio_ctxt,
+                       deepspeed_aio_config_t* aio_config)
 {
-    if (_read_op && _buffer.is_cuda()) { _buffer.copy_(_cpu_buffer.to(torch::kCUDA)); }
-    if (_read_op && _buffer.is_xpu()) { _buffer.copy_(_cpu_buffer.to(torch::kXPU)); }
-#if defined(__ENABLE_CANN__)
-    if (_read_op && torch_npu::utils::is_npu(_buffer)) {
-        auto device = at::Device("npu:0");
-        _buffer.copy_(_cpu_buffer.to(device));
-    }
-#endif
 }
