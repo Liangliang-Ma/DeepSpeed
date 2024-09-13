@@ -17,22 +17,7 @@ cpu_op_desc_t::cpu_op_desc_t(const bool read_op,
     : io_op_desc_t(read_op, buffer, fd, filename, file_num_bytes, num_threads, validate),
       _cpu_buffer(buffer)
 {
-    // Need to use CPU bounce buffer if buffer is not a page-locked DRAM memory.
-    _use_bounce_buffer = !(_buffer.is_cpu() && _buffer.is_pinned());
-    std::cout << _buffer.is_cpu() << std::endl;
-    std::cout << _buffer.is_pinned() << std::endl;
-    std::cout << _use_bounce_buffer << std::endl;
-    // if (_use_bounce_buffer) {
-    //     if (_read_op) {
-    //         auto options = torch::TensorOptions()
-    //                            .dtype(_buffer.dtype())
-    //                            .layout(_buffer.layout())
-    //                            .device(torch::kCPU);
-    //         _cpu_buffer = torch::empty(_buffer.nbytes(), options).pin_memory();
-    //     } else {
-    //         _cpu_buffer = _buffer.to(torch::kCPU).pin_memory();
-    //     }
-    // }
+    // XPU don't handle buffer here. See XPU Accelerator pin_memory.
     _contiguous_buffer = _cpu_buffer.contiguous();
 }
 
