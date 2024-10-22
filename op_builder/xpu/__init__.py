@@ -6,6 +6,7 @@
 from .cpu_adam import CPUAdamBuilder
 from .cpu_adagrad import CPUAdagradBuilder
 from .fused_adam import FusedAdamBuilder
+from .fused_lamb import FusedLambBuilder
 from .async_io import AsyncIOBuilder
 from .inference import InferenceBuilder
 from .flash_attn import FlashAttentionBuilder
