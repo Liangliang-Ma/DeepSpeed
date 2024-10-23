@@ -9,6 +9,8 @@
 #include "ATen/TensorUtils.h"
 // #include "ATen/Type.h"
 #include "ATen/AccumulateType.h"
+#include <c10/xpu/XPUStream.h>
+#include <ipex.h>
 #include <sycl/sycl.hpp>
 
 #include <iostream>
@@ -66,6 +68,21 @@ typedef enum {
     ADAM_MODE_0 = 0,  // eps under square root
     ADAM_MODE_1 = 1   // eps outside square root
 } adamMode_t;
+
+sycl::queue* getCurrentXPUStream()
+{
+    c10::xpu::XPUStream stream = c10::xpu::getCurrentXPUStream();
+    auto& queue = stream.queue();
+    return &queue;
+}
+
+sycl::queue* getStreamFromPool(bool)
+{
+    // not implemented
+    return nullptr;
+}
+
+
 
 // s_a and s_b are in shared memory
 // g_a and g_b are in shared memory
@@ -188,7 +205,7 @@ __device__ void reduce_two_vectors_in_register(T a, T b, T* g_a, T* g_b)
 }
 
 template <typename T, typename GRAD_T, int blockSize>
-__global__ void lamb_cuda_kernel_part1(
+__global__ void lamb_sycl_kernel_part1(
     T* __restrict__ p,
     GRAD_T* __restrict__ p_copy,  // For mixed precision training, pass NULL if not needed
     T* __restrict__ m,
@@ -235,7 +252,7 @@ __global__ void lamb_cuda_kernel_part1(
 }
 
 template <typename T, typename GRAD_T, int blockSize>
-__global__ void lamb_cuda_kernel_part2(const size_t tsize, T* __restrict__ g_a, T* __restrict__ g_b)
+__global__ void lamb_sycl_kernel_part2(const size_t tsize, T* __restrict__ g_a, T* __restrict__ g_b)
 {
     T* s_a = SharedMemory<T>();
     T* s_b = SharedMemory<T>() + cg::this_thread_block().size();
@@ -254,7 +271,7 @@ __global__ void lamb_cuda_kernel_part2(const size_t tsize, T* __restrict__ g_a, 
 }
 
 template <typename T, typename GRAD_T>
-__global__ void lamb_cuda_kernel_part3(
+__global__ void lamb_sycl_kernel_part3(
     T* __restrict__ p,
     GRAD_T* __restrict__ p_copy,  // For mixed precision training, pass NULL if not needed
     T* __restrict__ m,
@@ -353,7 +370,7 @@ void fused_lamb_sycl(at::Tensor& p,
     const dim3 blocks(num_blocks);
     const dim3 threads(threadsPerBlock);
 
-    AT_ASSERTM(at::cuda::detail::canUse32BitIndexMath(p),
+    AT_ASSERTM(torch_ipex::xpu::dpcpp::detail::canUse32BitIndexMath(p),
                "parameter tensor is too large to be indexed with int32");
     // Constants
     float step_size = 0;
@@ -364,7 +381,7 @@ void fused_lamb_sycl(at::Tensor& p,
     } else {
         step_size = lr;
     }
-    cudaStream_t stream = at::cuda::getCurrentCUDAStream();
+    auto stream = at::cuda::getCurrentXPUStream();
 
     if (g.type().scalarType() == at::ScalarType::Half) {
         // all other values should be fp32 for half gradients
@@ -373,10 +390,10 @@ void fused_lamb_sycl(at::Tensor& p,
         // dispatch is done on the gradient type
         using namespace at;  // prevents "toString is undefined" errors
         AT_DISPATCH_FLOATING_TYPES_AND_HALF(
-            g.scalar_type(), "lamb_cuda_kernel", ([&] {
+            g.scalar_type(), "lamb_sycl_kernel", ([&] {
                 using accscalar_t = at::acc_type<scalar_t, true>;
 
-                lamb_cuda_kernel_part1<accscalar_t, scalar_t, threadsPerBlock>
+                lamb_sycl_kernel_part1<accscalar_t, scalar_t, threadsPerBlock>
                     <<<blocks, threadsPerBlock, smemsize, stream>>>(
                         p.data<accscalar_t>(),
                         p_copy.numel() ? p_copy.data<scalar_t>() : NULL,
@@ -394,11 +411,11 @@ void fused_lamb_sycl(at::Tensor& p,
                         w_l2_i.data<accscalar_t>(),
                         u_l2_i.data<accscalar_t>());
 
-                lamb_cuda_kernel_part2<accscalar_t, scalar_t, threadsPerBlock>
+                lamb_sycl_kernel_part2<accscalar_t, scalar_t, threadsPerBlock>
                     <<<1, threadsPerBlock, smemsize, stream>>>(
                         num_blocks, w_l2_i.data<accscalar_t>(), u_l2_i.data<accscalar_t>());
 
-                lamb_cuda_kernel_part3<accscalar_t, scalar_t>
+                lamb_sycl_kernel_part3<accscalar_t, scalar_t>
                     <<<blocks, threadsPerBlock, smemsize, stream>>>(
                         p.data<accscalar_t>(),
                         p_copy.numel() ? p_copy.data<scalar_t>() : NULL,
@@ -423,7 +440,7 @@ void fused_lamb_sycl(at::Tensor& p,
         using namespace at;
         AT_DISPATCH_FLOATING_TYPES(
             g.scalar_type(), "lamb_cuda_kernel", ([&] {
-                lamb_cuda_kernel_part1<scalar_t, scalar_t, threadsPerBlock>
+                lamb_sycl_kernel_part1<scalar_t, scalar_t, threadsPerBlock>
                     <<<blocks, threadsPerBlock, smemsize, stream>>>(
                         p.data<scalar_t>(),
                         NULL,  // don't output p_copy for fp32, it's wasted write
@@ -441,11 +458,11 @@ void fused_lamb_sycl(at::Tensor& p,
                         w_l2_i.data<scalar_t>(),
                         u_l2_i.data<scalar_t>());
 
-                lamb_cuda_kernel_part2<scalar_t, scalar_t, threadsPerBlock>
+                lamb_sycl_kernel_part2<scalar_t, scalar_t, threadsPerBlock>
                     <<<1, threadsPerBlock, smemsize, stream>>>(
                         num_blocks, w_l2_i.data<scalar_t>(), u_l2_i.data<scalar_t>());
 
-                lamb_cuda_kernel_part3<scalar_t, scalar_t>
+                lamb_sycl_kernel_part3<scalar_t, scalar_t>
                     <<<blocks, threadsPerBlock, smemsize, stream>>>(
                         p.data<scalar_t>(),
                         NULL,  // don't output p_copy for fp32, it's wasted write
