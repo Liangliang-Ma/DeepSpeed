@@ -14,53 +14,7 @@
 #include <sycl/sycl.hpp>
 
 #include <iostream>
-
-// #include <helper_functions.h>
-#if defined(__HIP_PLATFORM_AMD__) && HIP_VERSION > 305
-#include <hip/hip_cooperative_groups.h>
-#else
-#include <cooperative_groups.h>
-#endif
 #include <stdio.h>
-
-namespace cg = cooperative_groups;
-
-// Utility class used to avoid linker errors with extern
-// unsized shared memory arrays with templated type
-namespace {
-// This is the un-specialized struct.  Note that we prevent instantiation of this
-// struct by putting an undefined symbol in the function body so it won't compile.
-template <typename T>
-struct SharedMemory {
-    // Ensure that we won't compile any un-specialized types
-    __device__ inline operator T*()
-    {
-#ifndef _WIN32
-        extern __device__ void error(void);
-        error();
-#endif
-        return NULL;
-    }
-};
-
-template <>
-struct SharedMemory<float> {
-    __device__ inline operator float*()
-    {
-        extern __shared__ float s_float[];
-        return s_float;
-    }
-};
-
-template <>
-struct SharedMemory<double> {
-    __device__ inline operator double*()
-    {
-        extern __shared__ double s_double[];
-        return s_double;
-    }
-};
-}  // namespace
 
 #include "type_shim.h"
 
@@ -84,128 +38,147 @@ sycl::queue* getStreamFromPool(bool)
 
 
 
-// s_a and s_b are in shared memory
-// g_a and g_b are in shared memory
-template <typename T, int blockSize>
-__device__ void reduce_block_in_shared_memory(T* s_a, T* s_b, T* g_a, T* g_b)
-{
-    // Handle to thread block group
-    cg::thread_block cta = cg::this_thread_block();
+// // s_a and s_b are in shared memory
+// // g_a and g_b are in shared memory
+// template <typename T, int blockSize>
+// __device__ void reduce_block_in_shared_memory(T* s_a, T* s_b, T* g_a, T* g_b)
+// {
+//     // Handle to thread block group
+//     cg::thread_block cta = cg::this_thread_block();
 
-    // perform block reduction in shared memory,
-    unsigned int tid = cta.thread_rank();
+//     // perform block reduction in shared memory,
+//     unsigned int tid = cta.thread_rank();
 
-    T a_sum = s_a[tid];
-    T b_sum = s_b[tid];
+//     T a_sum = s_a[tid];
+//     T b_sum = s_b[tid];
 
-    cg::sync(cta);
+//     cg::sync(cta);
 
-    // do reduction in shared mem
-    if ((blockSize >= 512) && (tid < 256)) {
-        s_a[tid] = a_sum = a_sum + s_a[tid + 256];
-        s_b[tid] = b_sum = b_sum + s_b[tid + 256];
-    }
+//     // do reduction in shared mem
+//     if ((blockSize >= 512) && (tid < 256)) {
+//         s_a[tid] = a_sum = a_sum + s_a[tid + 256];
+//         s_b[tid] = b_sum = b_sum + s_b[tid + 256];
+//     }
 
-    cg::sync(cta);
+//     cg::sync(cta);
 
-    if ((blockSize >= 256) && (tid < 128)) {
-        s_a[tid] = a_sum = a_sum + s_a[tid + 128];
-        s_b[tid] = b_sum = b_sum + s_b[tid + 128];
-    }
+//     if ((blockSize >= 256) && (tid < 128)) {
+//         s_a[tid] = a_sum = a_sum + s_a[tid + 128];
+//         s_b[tid] = b_sum = b_sum + s_b[tid + 128];
+//     }
 
-    cg::sync(cta);
+//     cg::sync(cta);
 
-    if ((blockSize >= 128) && (tid < 64)) {
-        s_a[tid] = a_sum = a_sum + s_a[tid + 64];
-        s_b[tid] = b_sum = b_sum + s_b[tid + 64];
-    }
+//     if ((blockSize >= 128) && (tid < 64)) {
+//         s_a[tid] = a_sum = a_sum + s_a[tid + 64];
+//         s_b[tid] = b_sum = b_sum + s_b[tid + 64];
+//     }
 
-    cg::sync(cta);
+//     cg::sync(cta);
 
-#if (__CUDA_ARCH__ >= 300) || (defined(__HIP_PLATFORM_AMD__) && HIP_VERSION >= 502)
-    if (tid < 32) {
-        cg::coalesced_group active = cg::coalesced_threads();
+// #if (__CUDA_ARCH__ >= 300) || (defined(__HIP_PLATFORM_AMD__) && HIP_VERSION >= 502)
+//     if (tid < 32) {
+//         cg::coalesced_group active = cg::coalesced_threads();
 
-        // Fetch final intermediate sum from 2nd warp
-        if (blockSize >= 64) {
-            a_sum = a_sum + s_a[tid + 32];
-            b_sum = b_sum + s_b[tid + 32];
-        }
+//         // Fetch final intermediate sum from 2nd warp
+//         if (blockSize >= 64) {
+//             a_sum = a_sum + s_a[tid + 32];
+//             b_sum = b_sum + s_b[tid + 32];
+//         }
 
-        // Reduce final warp using shuffle
-        for (int offset = warpSize / 2; offset > 0; offset /= 2) {
-            a_sum += active.shfl_down(a_sum, offset);
-            b_sum += active.shfl_down(b_sum, offset);
-        }
-    }
-#else
-    if ((blockSize >= 64) && (tid < 32)) {
-        s_a[tid] = a_sum = a_sum + s_a[tid + 32];
-        s_b[tid] = b_sum = b_sum + s_b[tid + 32];
-    }
+//         // Reduce final warp using shuffle
+//         for (int offset = warpSize / 2; offset > 0; offset /= 2) {
+//             a_sum += active.shfl_down(a_sum, offset);
+//             b_sum += active.shfl_down(b_sum, offset);
+//         }
+//     }
+// #else
+//     if ((blockSize >= 64) && (tid < 32)) {
+//         s_a[tid] = a_sum = a_sum + s_a[tid + 32];
+//         s_b[tid] = b_sum = b_sum + s_b[tid + 32];
+//     }
 
-    cg::sync(cta);
+//     cg::sync(cta);
 
-    if ((blockSize >= 32) && (tid < 16)) {
-        s_a[tid] = a_sum = a_sum + s_a[tid + 16];
-        s_b[tid] = b_sum = b_sum + s_b[tid + 16];
-    }
+//     if ((blockSize >= 32) && (tid < 16)) {
+//         s_a[tid] = a_sum = a_sum + s_a[tid + 16];
+//         s_b[tid] = b_sum = b_sum + s_b[tid + 16];
+//     }
 
-    cg::sync(cta);
+//     cg::sync(cta);
 
-    if ((blockSize >= 16) && (tid < 8)) {
-        s_a[tid] = a_sum = a_sum + s_a[tid + 8];
-        s_b[tid] = b_sum = b_sum + s_b[tid + 8];
-    }
+//     if ((blockSize >= 16) && (tid < 8)) {
+//         s_a[tid] = a_sum = a_sum + s_a[tid + 8];
+//         s_b[tid] = b_sum = b_sum + s_b[tid + 8];
+//     }
 
-    cg::sync(cta);
+//     cg::sync(cta);
 
-    if ((blockSize >= 8) && (tid < 4)) {
-        s_a[tid] = a_sum = a_sum + s_a[tid + 4];
-        s_b[tid] = b_sum = b_sum + s_b[tid + 4];
-    }
+//     if ((blockSize >= 8) && (tid < 4)) {
+//         s_a[tid] = a_sum = a_sum + s_a[tid + 4];
+//         s_b[tid] = b_sum = b_sum + s_b[tid + 4];
+//     }
 
-    cg::sync(cta);
+//     cg::sync(cta);
 
-    if ((blockSize >= 4) && (tid < 2)) {
-        s_a[tid] = a_sum = a_sum + s_a[tid + 2];
-        s_b[tid] = b_sum = b_sum + s_b[tid + 2];
-    }
+//     if ((blockSize >= 4) && (tid < 2)) {
+//         s_a[tid] = a_sum = a_sum + s_a[tid + 2];
+//         s_b[tid] = b_sum = b_sum + s_b[tid + 2];
+//     }
 
-    cg::sync(cta);
+//     cg::sync(cta);
 
-    if ((blockSize >= 2) && (tid < 1)) {
-        s_a[tid] = a_sum = a_sum + s_a[tid + 1];
-        s_b[tid] = b_sum = b_sum + s_b[tid + 1];
-    }
+//     if ((blockSize >= 2) && (tid < 1)) {
+//         s_a[tid] = a_sum = a_sum + s_a[tid + 1];
+//         s_b[tid] = b_sum = b_sum + s_b[tid + 1];
+//     }
 
-    cg::sync(cta);
+//     cg::sync(cta);
 
-#endif
+// #endif
 
-    // write result for this block to global mem
-    if (tid == 0) {
-        g_a[blockIdx.x] = (T)a_sum;
-        g_b[blockIdx.x] = (T)b_sum;
-    }
-}
+//     // write result for this block to global mem
+//     if (tid == 0) {
+//         g_a[blockIdx.x] = (T)a_sum;
+//         g_b[blockIdx.x] = (T)b_sum;
+//     }
+// }
 
-template <typename T, int blockSize>
-__device__ void reduce_two_vectors_in_register(T a, T b, T* g_a, T* g_b)
-{
-    const int threadIdInBlock = cg::this_thread_block().thread_rank();
+// template <typename T, int blockSize>
+// __device__ void reduce_two_vectors_in_register(T a, T b, T* g_a, T* g_b)
+// {
+//     const int threadIdInBlock = cg::this_thread_block().thread_rank();
 
-    T* s_a = SharedMemory<T>();
-    T* s_b = SharedMemory<T>() + cg::this_thread_block().size();
+//     T* s_a = SharedMemory<T>();
+//     T* s_b = SharedMemory<T>() + cg::this_thread_block().size();
 
-    s_a[threadIdInBlock] = a;
-    s_b[threadIdInBlock] = b;
+//     s_a[threadIdInBlock] = a;
+//     s_b[threadIdInBlock] = b;
 
-    reduce_block_in_shared_memory<T, blockSize>(s_a, s_b, g_a, g_b);
-}
+//     reduce_block_in_shared_memory<T, blockSize>(s_a, s_b, g_a, g_b);
+// }
 
 template <typename T, typename GRAD_T, int blockSize>
-__global__ void lamb_sycl_kernel_part1(
+class lamb_sycl_kernel_part1 {
+ private:
+  T* __restrict__ p,
+    GRAD_T* __restrict__ p_copy,  // For mixed precision training, pass NULL if not needed
+    T* __restrict__ m,
+    T* __restrict__ v,
+    const GRAD_T* __restrict__ g,
+    const float b1,
+    const float b2,
+    const float eps,
+    const float grad_scale,
+    const float step_size,
+    const size_t tsize,
+    adamMode_t mode,
+    const float decay,
+    T* __restrict__ w_l2_i,
+    T* __restrict__ u_l2_i
+
+ public:
+   lamb_sycl_kernel_part1(
     T* __restrict__ p,
     GRAD_T* __restrict__ p_copy,  // For mixed precision training, pass NULL if not needed
     T* __restrict__ m,
@@ -221,7 +194,23 @@ __global__ void lamb_sycl_kernel_part1(
     const float decay,
     T* __restrict__ w_l2_i,
     T* __restrict__ u_l2_i)
-{
+    :   p(p),
+        p_copy(p_copy),
+        m(m),
+        v(v),
+        g(g),
+        b1(b1),
+        b2(b2),
+        eps(eps),
+        grad_scale(grad_scale),
+        step_size(step_size),
+        tsize(tsize),
+        mode(mode),
+        decay(decay),
+        w_l2_i(w_l2_i),
+        u_l2_i(u_l2_i){}
+
+void operator()(sycl::nd_item<3>) const {
     // Assuming 2D grids and 2D blocks
     const int blockId = gridDim.x * blockIdx.y + blockIdx.x;
     const int threadsPerBlock = blockDim.x * blockDim.y;
@@ -250,86 +239,87 @@ __global__ void lamb_sycl_kernel_part1(
 
     reduce_two_vectors_in_register<T, blockSize>(reg_w, reg_u, w_l2_i, u_l2_i);
 }
+};
 
-template <typename T, typename GRAD_T, int blockSize>
-__global__ void lamb_sycl_kernel_part2(const size_t tsize, T* __restrict__ g_a, T* __restrict__ g_b)
-{
-    T* s_a = SharedMemory<T>();
-    T* s_b = SharedMemory<T>() + cg::this_thread_block().size();
+// template <typename T, typename GRAD_T, int blockSize>
+// __global__ void lamb_sycl_kernel_part2(const size_t tsize, T* __restrict__ g_a, T* __restrict__ g_b)
+// {
+//     T* s_a = SharedMemory<T>();
+//     T* s_b = SharedMemory<T>() + cg::this_thread_block().size();
 
-    const int threadIdInBlock = cg::this_thread_block().thread_rank();
+//     const int threadIdInBlock = cg::this_thread_block().thread_rank();
 
-    s_a[threadIdInBlock] = g_a[threadIdInBlock];
-    s_b[threadIdInBlock] = g_b[threadIdInBlock];
+//     s_a[threadIdInBlock] = g_a[threadIdInBlock];
+//     s_b[threadIdInBlock] = g_b[threadIdInBlock];
 
-    if (threadIdInBlock >= tsize) {
-        s_a[threadIdInBlock] = 0.0;
-        s_b[threadIdInBlock] = 0.0;
-    }
+//     if (threadIdInBlock >= tsize) {
+//         s_a[threadIdInBlock] = 0.0;
+//         s_b[threadIdInBlock] = 0.0;
+//     }
 
-    reduce_block_in_shared_memory<T, blockSize>(s_a, s_b, g_a, g_b);
-}
+//     reduce_block_in_shared_memory<T, blockSize>(s_a, s_b, g_a, g_b);
+// }
 
-template <typename T, typename GRAD_T>
-__global__ void lamb_sycl_kernel_part3(
-    T* __restrict__ p,
-    GRAD_T* __restrict__ p_copy,  // For mixed precision training, pass NULL if not needed
-    T* __restrict__ m,
-    T* __restrict__ v,
-    const GRAD_T* __restrict__ g,
-    const float b1,
-    const float b2,
-    const float max_coeff,
-    const float min_coeff,
-    const float eps,
-    const float grad_scale,
-    const float step_size,
-    const size_t tsize,
-    adamMode_t mode,
-    const float decay,
-    T* __restrict__ w_l2_i,
-    T* __restrict__ u_l2_i,
-    T* __restrict__ lamb_coeff_val)
-{
-    // Assuming 2D grids and 2D blocks
-    const int blockId = gridDim.x * blockIdx.y + blockIdx.x;
-    const int threadsPerBlock = blockDim.x * blockDim.y;
-    const int threadIdInBlock = cg::this_thread_block().thread_rank();
-    const int i = (blockId * threadsPerBlock + threadIdInBlock);
-    const int totThreads = gridDim.x * gridDim.y * threadsPerBlock;
+// template <typename T, typename GRAD_T>
+// __global__ void lamb_sycl_kernel_part3(
+//     T* __restrict__ p,
+//     GRAD_T* __restrict__ p_copy,  // For mixed precision training, pass NULL if not needed
+//     T* __restrict__ m,
+//     T* __restrict__ v,
+//     const GRAD_T* __restrict__ g,
+//     const float b1,
+//     const float b2,
+//     const float max_coeff,
+//     const float min_coeff,
+//     const float eps,
+//     const float grad_scale,
+//     const float step_size,
+//     const size_t tsize,
+//     adamMode_t mode,
+//     const float decay,
+//     T* __restrict__ w_l2_i,
+//     T* __restrict__ u_l2_i,
+//     T* __restrict__ lamb_coeff_val)
+// {
+//     // Assuming 2D grids and 2D blocks
+//     const int blockId = gridDim.x * blockIdx.y + blockIdx.x;
+//     const int threadsPerBlock = blockDim.x * blockDim.y;
+//     const int threadIdInBlock = cg::this_thread_block().thread_rank();
+//     const int i = (blockId * threadsPerBlock + threadIdInBlock);
+//     const int totThreads = gridDim.x * gridDim.y * threadsPerBlock;
 
-    T reg_w = sqrtf(w_l2_i[0]);
-    T reg_u = sqrtf(u_l2_i[0]);
+//     T reg_w = sqrtf(w_l2_i[0]);
+//     T reg_u = sqrtf(u_l2_i[0]);
 
-    float lamb_coeff = 1.0;
+//     float lamb_coeff = 1.0;
 
-    if (reg_w != 0 && reg_u != 0) {
-        lamb_coeff = reg_w / reg_u;
-        if (lamb_coeff > max_coeff) { lamb_coeff = max_coeff; }
-        if (lamb_coeff < min_coeff) { lamb_coeff = min_coeff; }
-    }
+//     if (reg_w != 0 && reg_u != 0) {
+//         lamb_coeff = reg_w / reg_u;
+//         if (lamb_coeff > max_coeff) { lamb_coeff = max_coeff; }
+//         if (lamb_coeff < min_coeff) { lamb_coeff = min_coeff; }
+//     }
 
-    if (blockId == 0 && threadIdInBlock == 0) {
-        lamb_coeff_val[0] = lamb_coeff;
-        // printf("Cuda Lamb Coeff is %.6f \n",lamb_coeff);
-    }
+//     if (blockId == 0 && threadIdInBlock == 0) {
+//         lamb_coeff_val[0] = lamb_coeff;
+//         // printf("Cuda Lamb Coeff is %.6f \n",lamb_coeff);
+//     }
 
-    for (int j = i; j < tsize; j += totThreads) {
-        T pj = (float)p[j];
-        T mj = m[j];
-        T vj = v[j];
-        float denom;
-        if (mode == ADAM_MODE_0)
-            denom = sqrtf(vj + eps);
-        else  // Mode 1
-            denom = sqrtf(vj) + eps;
-        T update = (mj / denom) + (decay * pj);
+//     for (int j = i; j < tsize; j += totThreads) {
+//         T pj = (float)p[j];
+//         T mj = m[j];
+//         T vj = v[j];
+//         float denom;
+//         if (mode == ADAM_MODE_0)
+//             denom = sqrtf(vj + eps);
+//         else  // Mode 1
+//             denom = sqrtf(vj) + eps;
+//         T update = (mj / denom) + (decay * pj);
 
-        pj = pj - (step_size * lamb_coeff * update);
-        p[j] = pj;
-        if (p_copy != NULL) p_copy[j] = (GRAD_T)pj;
-    }
-}
+//         pj = pj - (step_size * lamb_coeff * update);
+//         p[j] = pj;
+//         if (p_copy != NULL) p_copy[j] = (GRAD_T)pj;
+//     }
+// }
 
 void fused_lamb_sycl(at::Tensor& p,
                      at::Tensor& p_copy,
@@ -393,98 +383,98 @@ void fused_lamb_sycl(at::Tensor& p,
             g.scalar_type(), "lamb_sycl_kernel", ([&] {
                 using accscalar_t = at::acc_type<scalar_t, true>;
 
-                lamb_sycl_kernel_part1<accscalar_t, scalar_t, threadsPerBlock>
-                    <<<blocks, threadsPerBlock, smemsize, stream>>>(
-                        p.data<accscalar_t>(),
-                        p_copy.numel() ? p_copy.data<scalar_t>() : NULL,
-                        m.data<accscalar_t>(),
-                        v.data<accscalar_t>(),
-                        g.data<scalar_t>(),
-                        beta1,
-                        beta2,
-                        eps,
-                        grad_scale,
-                        step_size,
-                        tsize,
-                        (adamMode_t)mode,
-                        decay,
-                        w_l2_i.data<accscalar_t>(),
-                        u_l2_i.data<accscalar_t>());
+                // lamb_sycl_kernel_part1<accscalar_t, scalar_t, threadsPerBlock>
+                //     <<<blocks, threadsPerBlock, smemsize, stream>>>(
+                //         p.data<accscalar_t>(),
+                //         p_copy.numel() ? p_copy.data<scalar_t>() : NULL,
+                //         m.data<accscalar_t>(),
+                //         v.data<accscalar_t>(),
+                //         g.data<scalar_t>(),
+                //         beta1,
+                //         beta2,
+                //         eps,
+                //         grad_scale,
+                //         step_size,
+                //         tsize,
+                //         (adamMode_t)mode,
+                //         decay,
+                //         w_l2_i.data<accscalar_t>(),
+                //         u_l2_i.data<accscalar_t>());
 
-                lamb_sycl_kernel_part2<accscalar_t, scalar_t, threadsPerBlock>
-                    <<<1, threadsPerBlock, smemsize, stream>>>(
-                        num_blocks, w_l2_i.data<accscalar_t>(), u_l2_i.data<accscalar_t>());
+                // lamb_sycl_kernel_part2<accscalar_t, scalar_t, threadsPerBlock>
+                //     <<<1, threadsPerBlock, smemsize, stream>>>(
+                //         num_blocks, w_l2_i.data<accscalar_t>(), u_l2_i.data<accscalar_t>());
 
-                lamb_sycl_kernel_part3<accscalar_t, scalar_t>
-                    <<<blocks, threadsPerBlock, smemsize, stream>>>(
-                        p.data<accscalar_t>(),
-                        p_copy.numel() ? p_copy.data<scalar_t>() : NULL,
-                        m.data<accscalar_t>(),
-                        v.data<accscalar_t>(),
-                        g.data<scalar_t>(),
-                        beta1,
-                        beta2,
-                        max_coeff,
-                        min_coeff,
-                        eps,
-                        grad_scale,
-                        step_size,
-                        tsize,
-                        (adamMode_t)mode,
-                        decay,
-                        w_l2_i.data<accscalar_t>(),
-                        u_l2_i.data<accscalar_t>(),
-                        lamb_coeff.data<accscalar_t>());
+                // lamb_sycl_kernel_part3<accscalar_t, scalar_t>
+                //     <<<blocks, threadsPerBlock, smemsize, stream>>>(
+                //         p.data<accscalar_t>(),
+                //         p_copy.numel() ? p_copy.data<scalar_t>() : NULL,
+                //         m.data<accscalar_t>(),
+                //         v.data<accscalar_t>(),
+                //         g.data<scalar_t>(),
+                //         beta1,
+                //         beta2,
+                //         max_coeff,
+                //         min_coeff,
+                //         eps,
+                //         grad_scale,
+                //         step_size,
+                //         tsize,
+                //         (adamMode_t)mode,
+                //         decay,
+                //         w_l2_i.data<accscalar_t>(),
+                //         u_l2_i.data<accscalar_t>(),
+                //         lamb_coeff.data<accscalar_t>());
             }));
     } else {
         using namespace at;
         AT_DISPATCH_FLOATING_TYPES(
             g.scalar_type(), "lamb_cuda_kernel", ([&] {
-                lamb_sycl_kernel_part1<scalar_t, scalar_t, threadsPerBlock>
-                    <<<blocks, threadsPerBlock, smemsize, stream>>>(
-                        p.data<scalar_t>(),
-                        NULL,  // don't output p_copy for fp32, it's wasted write
-                        m.data<scalar_t>(),
-                        v.data<scalar_t>(),
-                        g.data<scalar_t>(),
-                        beta1,
-                        beta2,
-                        eps,
-                        grad_scale,
-                        step_size,
-                        tsize,
-                        (adamMode_t)mode,
-                        decay,
-                        w_l2_i.data<scalar_t>(),
-                        u_l2_i.data<scalar_t>());
+            //     lamb_sycl_kernel_part1<scalar_t, scalar_t, threadsPerBlock>
+            //         <<<blocks, threadsPerBlock, smemsize, stream>>>(
+            //             p.data<scalar_t>(),
+            //             NULL,  // don't output p_copy for fp32, it's wasted write
+            //             m.data<scalar_t>(),
+            //             v.data<scalar_t>(),
+            //             g.data<scalar_t>(),
+            //             beta1,
+            //             beta2,
+            //             eps,
+            //             grad_scale,
+            //             step_size,
+            //             tsize,
+            //             (adamMode_t)mode,
+            //             decay,
+            //             w_l2_i.data<scalar_t>(),
+            //             u_l2_i.data<scalar_t>());
 
-                lamb_sycl_kernel_part2<scalar_t, scalar_t, threadsPerBlock>
-                    <<<1, threadsPerBlock, smemsize, stream>>>(
-                        num_blocks, w_l2_i.data<scalar_t>(), u_l2_i.data<scalar_t>());
+            //     lamb_sycl_kernel_part2<scalar_t, scalar_t, threadsPerBlock>
+            //         <<<1, threadsPerBlock, smemsize, stream>>>(
+            //             num_blocks, w_l2_i.data<scalar_t>(), u_l2_i.data<scalar_t>());
 
-                lamb_sycl_kernel_part3<scalar_t, scalar_t>
-                    <<<blocks, threadsPerBlock, smemsize, stream>>>(
-                        p.data<scalar_t>(),
-                        NULL,  // don't output p_copy for fp32, it's wasted write
-                        m.data<scalar_t>(),
-                        v.data<scalar_t>(),
-                        g.data<scalar_t>(),
-                        beta1,
-                        beta2,
-                        max_coeff,
-                        min_coeff,
-                        eps,
-                        grad_scale,
-                        step_size,
-                        tsize,
-                        (adamMode_t)mode,
-                        decay,
-                        w_l2_i.data<scalar_t>(),
-                        u_l2_i.data<scalar_t>(),
-                        lamb_coeff.data<scalar_t>());
+            //     lamb_sycl_kernel_part3<scalar_t, scalar_t>
+            //         <<<blocks, threadsPerBlock, smemsize, stream>>>(
+            //             p.data<scalar_t>(),
+            //             NULL,  // don't output p_copy for fp32, it's wasted write
+            //             m.data<scalar_t>(),
+            //             v.data<scalar_t>(),
+            //             g.data<scalar_t>(),
+            //             beta1,
+            //             beta2,
+            //             max_coeff,
+            //             min_coeff,
+            //             eps,
+            //             grad_scale,
+            //             step_size,
+            //             tsize,
+            //             (adamMode_t)mode,
+            //             decay,
+            //             w_l2_i.data<scalar_t>(),
+            //             u_l2_i.data<scalar_t>(),
+            //             lamb_coeff.data<scalar_t>());
             }));
     }
-    C10_CUDA_CHECK(cudaGetLastError());
+    // C10_CUDA_CHECK(cudaGetLastError());
 }
 
 // template __device__ void reduce_two_vectors_in_register<float,512>(float a, float b, float* g_a,
