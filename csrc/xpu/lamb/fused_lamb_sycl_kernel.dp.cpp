@@ -357,8 +357,8 @@ void fused_lamb_sycl(at::Tensor& p,
     else
         smemsize = 2 * threadsPerBlock * sizeof(float);
 
-    const dim3 blocks(num_blocks);
-    const dim3 threads(threadsPerBlock);
+    sycl::range<3> block(1, 1, threadsPerBlock);
+    sycl::range<3> grid(1, 1, num_blocks);
 
     AT_ASSERTM(torch_ipex::xpu::dpcpp::detail::canUse32BitIndexMath(p),
                "parameter tensor is too large to be indexed with int32");
@@ -371,7 +371,8 @@ void fused_lamb_sycl(at::Tensor& p,
     } else {
         step_size = lr;
     }
-    auto stream = at::cuda::getCurrentXPUStream();
+    c10::xpu::XPUStream stream = c10::xpu::getCurrentXPUStream();
+    auto& queue = stream.queue();
 
     if (g.type().scalarType() == at::ScalarType::Half) {
         // all other values should be fp32 for half gradients
@@ -382,49 +383,57 @@ void fused_lamb_sycl(at::Tensor& p,
         AT_DISPATCH_FLOATING_TYPES_AND_HALF(
             g.scalar_type(), "lamb_sycl_kernel", ([&] {
                 using accscalar_t = at::acc_type<scalar_t, true>;
-
-                // lamb_sycl_kernel_part1<accscalar_t, scalar_t, threadsPerBlock>
-                //     <<<blocks, threadsPerBlock, smemsize, stream>>>(
-                //         p.data<accscalar_t>(),
-                //         p_copy.numel() ? p_copy.data<scalar_t>() : NULL,
-                //         m.data<accscalar_t>(),
-                //         v.data<accscalar_t>(),
-                //         g.data<scalar_t>(),
-                //         beta1,
-                //         beta2,
-                //         eps,
-                //         grad_scale,
-                //         step_size,
-                //         tsize,
-                //         (adamMode_t)mode,
-                //         decay,
-                //         w_l2_i.data<accscalar_t>(),
-                //         u_l2_i.data<accscalar_t>());
-
-                // lamb_sycl_kernel_part2<accscalar_t, scalar_t, threadsPerBlock>
-                //     <<<1, threadsPerBlock, smemsize, stream>>>(
-                //         num_blocks, w_l2_i.data<accscalar_t>(), u_l2_i.data<accscalar_t>());
-
-                // lamb_sycl_kernel_part3<accscalar_t, scalar_t>
-                //     <<<blocks, threadsPerBlock, smemsize, stream>>>(
-                //         p.data<accscalar_t>(),
-                //         p_copy.numel() ? p_copy.data<scalar_t>() : NULL,
-                //         m.data<accscalar_t>(),
-                //         v.data<accscalar_t>(),
-                //         g.data<scalar_t>(),
-                //         beta1,
-                //         beta2,
-                //         max_coeff,
-                //         min_coeff,
-                //         eps,
-                //         grad_scale,
-                //         step_size,
-                //         tsize,
-                //         (adamMode_t)mode,
-                //         decay,
-                //         w_l2_i.data<accscalar_t>(),
-                //         u_l2_i.data<accscalar_t>(),
-                //         lamb_coeff.data<accscalar_t>());
+                stream->submit([&](sycl::handler& cgh) {                                 
+                    lamb_sycl_kernel_part1<accscalar_t, scalar_t, threadsPerBlock>
+                        fn(p.data<accscalar_t>(),
+                            p_copy.numel() ? p_copy.data<scalar_t>() : NULL,
+                            m.data<accscalar_t>(),
+                            v.data<accscalar_t>(),
+                            g.data<scalar_t>(),
+                            beta1,
+                            beta2,
+                            eps,
+                            grad_scale,
+                            step_size,
+                            tsize,
+                            (adamMode_t)mode,
+                            decay,
+                            w_l2_i.data<accscalar_t>(),
+                            u_l2_i.data<accscalar_t>());
+                                    
+                    cgh.parallel_for(sycl::nd_range<3>(grid * block, block), fn); 
+                    });
+                
+                stream->submit([&](sycl::handler& cgh) {                                 
+                    lamb_sycl_kernel_part2<accscalar_t, scalar_t, threadsPerBlock>
+                        fn(num_blocks, w_l2_i.data<accscalar_t>(), u_l2_i.data<accscalar_t>());
+                                    
+                    cgh.parallel_for(sycl::nd_range<3>(1 * block, block), fn); 
+                    });       
+                
+                stream->submit([&](sycl::handler& cgh) {                                 
+                    lamb_sycl_kernel_part3<accscalar_t, scalar_t>
+                        fn(p.data<accscalar_t>(),
+                        p_copy.numel() ? p_copy.data<scalar_t>() : NULL,
+                        m.data<accscalar_t>(),
+                        v.data<accscalar_t>(),
+                        g.data<scalar_t>(),
+                        beta1,
+                        beta2,
+                        max_coeff,
+                        min_coeff,
+                        eps,
+                        grad_scale,
+                        step_size,
+                        tsize,
+                        (adamMode_t)mode,
+                        decay,
+                        w_l2_i.data<accscalar_t>(),
+                        u_l2_i.data<accscalar_t>(),
+                        lamb_coeff.data<accscalar_t>());
+                                    
+                    cgh.parallel_for(sycl::nd_range<3>(grid * block, block), fn); 
+                    });
             }));
     } else {
         using namespace at;
