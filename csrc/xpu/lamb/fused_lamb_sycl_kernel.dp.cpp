@@ -438,49 +438,59 @@ void fused_lamb_sycl(at::Tensor& p,
     } else {
         using namespace at;
         AT_DISPATCH_FLOATING_TYPES(
-            g.scalar_type(), "lamb_cuda_kernel", ([&] {
-            //     lamb_sycl_kernel_part1<scalar_t, scalar_t, threadsPerBlock>
-            //         <<<blocks, threadsPerBlock, smemsize, stream>>>(
-            //             p.data<scalar_t>(),
-            //             NULL,  // don't output p_copy for fp32, it's wasted write
-            //             m.data<scalar_t>(),
-            //             v.data<scalar_t>(),
-            //             g.data<scalar_t>(),
-            //             beta1,
-            //             beta2,
-            //             eps,
-            //             grad_scale,
-            //             step_size,
-            //             tsize,
-            //             (adamMode_t)mode,
-            //             decay,
-            //             w_l2_i.data<scalar_t>(),
-            //             u_l2_i.data<scalar_t>());
+            g.scalar_type(), "lamb_sycl_kernel", ([&] {
+                stream->submit([&](sycl::handler& cgh) {                                 
+                    lamb_sycl_kernel_part1<accscalar_t, scalar_t, threadsPerBlock>
+                        fn(p.data<accscalar_t>(),
+                            p_copy.numel() ? p_copy.data<scalar_t>() : NULL,
+                            m.data<accscalar_t>(),
+                            v.data<accscalar_t>(),
+                            g.data<scalar_t>(),
+                            beta1,
+                            beta2,
+                            eps,
+                            grad_scale,
+                            step_size,
+                            tsize,
+                            (adamMode_t)mode,
+                            decay,
+                            w_l2_i.data<accscalar_t>(),
+                            u_l2_i.data<accscalar_t>());
+                                    
+                    cgh.parallel_for(sycl::nd_range<3>(grid * block, block), fn); 
+                    });
+                
+                stream->submit([&](sycl::handler& cgh) {                                 
+                    lamb_sycl_kernel_part2<accscalar_t, scalar_t, threadsPerBlock>
+                        fn(num_blocks, w_l2_i.data<accscalar_t>(), u_l2_i.data<accscalar_t>());
+                                    
+                    cgh.parallel_for(sycl::nd_range<3>(1 * block, block), fn); 
+                    });       
+                
+                stream->submit([&](sycl::handler& cgh) {                                 
+                    lamb_sycl_kernel_part3<accscalar_t, scalar_t>
+                        fn(p.data<accscalar_t>(),
+                        p_copy.numel() ? p_copy.data<scalar_t>() : NULL,
+                        m.data<accscalar_t>(),
+                        v.data<accscalar_t>(),
+                        g.data<scalar_t>(),
+                        beta1,
+                        beta2,
+                        max_coeff,
+                        min_coeff,
+                        eps,
+                        grad_scale,
+                        step_size,
+                        tsize,
+                        (adamMode_t)mode,
+                        decay,
+                        w_l2_i.data<accscalar_t>(),
+                        u_l2_i.data<accscalar_t>(),
+                        lamb_coeff.data<accscalar_t>());
+                                    
+                    cgh.parallel_for(sycl::nd_range<3>(grid * block, block), fn); 
+                    });
 
-            //     lamb_sycl_kernel_part2<scalar_t, scalar_t, threadsPerBlock>
-            //         <<<1, threadsPerBlock, smemsize, stream>>>(
-            //             num_blocks, w_l2_i.data<scalar_t>(), u_l2_i.data<scalar_t>());
-
-            //     lamb_sycl_kernel_part3<scalar_t, scalar_t>
-            //         <<<blocks, threadsPerBlock, smemsize, stream>>>(
-            //             p.data<scalar_t>(),
-            //             NULL,  // don't output p_copy for fp32, it's wasted write
-            //             m.data<scalar_t>(),
-            //             v.data<scalar_t>(),
-            //             g.data<scalar_t>(),
-            //             beta1,
-            //             beta2,
-            //             max_coeff,
-            //             min_coeff,
-            //             eps,
-            //             grad_scale,
-            //             step_size,
-            //             tsize,
-            //             (adamMode_t)mode,
-            //             decay,
-            //             w_l2_i.data<scalar_t>(),
-            //             u_l2_i.data<scalar_t>(),
-            //             lamb_coeff.data<scalar_t>());
             }));
     }
     // C10_CUDA_CHECK(cudaGetLastError());
