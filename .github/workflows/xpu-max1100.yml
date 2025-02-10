@@ -74,6 +74,7 @@ jobs:
         source ~/ds_env/bin/activate
         cd tests/unit
         pwd
+        pwd
         pytest --verbose accelerator/*
         pytest --verbose autotuning/*
         pytest --verbose checkpoint/test_reshape_checkpoint.py
