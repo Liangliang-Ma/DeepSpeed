@@ -34,7 +34,7 @@ permissions:
 
 jobs:
   unit-tests:
-    runs-on: [self-hosted, xpu]
+    runs-on: [self-hosted, xpu, qbq]
     container:
       image: intel/oneapi-basekit:2025.0.1-0-devel-ubuntu24.04
       ports:
@@ -80,6 +80,7 @@ jobs:
         pytest --verbose checkpoint/test_moe_checkpoint.py
         pytest --verbose checkpoint/test_shared_weights.py
         pytest --verbose launcher/test_ds_arguments.py launcher/test_run.py
+        pytest --verbose model_parallelism/*
         pytest --verbose moe/test_moe_tp.py
         pytest --verbose monitor/*
         pytest --verbose utils/*
