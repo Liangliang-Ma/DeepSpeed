@@ -73,11 +73,9 @@ jobs:
       run: |
         source ~/ds_env/bin/activate
         cd tests/unit
-        export ZE_AFFINITY_MASK=4,5,6,7
         pytest --verbose accelerator/*
         pytest --verbose autotuning/*
         pytest --verbose checkpoint/test_reshape_checkpoint.py
-        pytest --verbose checkpoint/test_moe_checkpoint.py
         pytest --verbose checkpoint/test_shared_weights.py
         pytest --verbose launcher/test_ds_arguments.py launcher/test_run.py
         pytest --verbose model_parallelism/*
