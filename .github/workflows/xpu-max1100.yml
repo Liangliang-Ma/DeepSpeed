@@ -73,8 +73,7 @@ jobs:
       run: |
         source ~/ds_env/bin/activate
         cd tests/unit
-        pwd
-        pwd
+        export CCL_ENABLE_SYCL_KERNELS=0
         pytest --verbose accelerator/*
         pytest --verbose autotuning/*
         pytest --verbose checkpoint/test_reshape_checkpoint.py
