@@ -47,7 +47,7 @@ jobs:
       shell: bash
       run: |
         apt-get update
-        apt-get install clinfo libaio-dev python3-pip python3.12-venv -y
+        apt-get install clinfo libaio-dev python3-pip python3.10-venv -y
         python3 -m venv ~/ds_env
         source ~/ds_env/bin/activate
         pip install torch==2.5.1 -f https://pytorch-extension.intel.com/release-whl/stable/xpu/cn/torch/
