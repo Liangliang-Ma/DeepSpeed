@@ -34,7 +34,7 @@ permissions:
 
 jobs:
   unit-tests:
-    runs-on: [self-hosted, my787]
+    runs-on: [self-hosted, intel, xpu]
     container:
       image: intel/intel-extension-for-pytorch:2.7.10-xpu-pip-base
       ports:
