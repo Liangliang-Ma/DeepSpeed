@@ -63,7 +63,6 @@ jobs:
         python3 -c "import torch; import intel_extension_for_pytorch; print('XPU available:', torch.xpu.is_available())"
         python3 -c "from deepspeed.accelerator import get_accelerator; print('accelerator:', get_accelerator()._name)"
         pip list
-        xpu-smi discovery
 
     - name: Unit tests
       shell: bash
