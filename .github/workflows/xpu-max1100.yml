@@ -36,7 +36,7 @@ jobs:
   unit-tests:
     runs-on: [self-hosted, intel, xpu]
     container:
-      image: intel/oneapi-basekit:2025.0.2-0-devel-ubuntu22.04
+      image: intel/oneapi-basekit:2025.1.1-0-devel-ubuntu22.04
       ports:
         - 80
       options: --privileged -it --rm --device /dev/dri:/dev/dri -v /dev/dri/by-path:/dev/dri/by-path --ipc=host --cap-add=ALL
