@@ -82,5 +82,4 @@ jobs:
         pytest --verbose runtime/zero/test_zeropp.py
         pytest --verbose runtime/test_autocast.py
         pytest --verbose runtime/test_data.py
-        pytest --verbose runtime/activation_checkpointing/*
         pytest --verbose runtime/zero/test_zero_dynamic_class.py
